@@ -31,7 +31,8 @@ def project_cleanup():
 				 'tmp',
 				 'images',
 				 'qubetmpfile',
-				 'sound']
+				 'sound',
+				 'Keyboard']
 
 	file_list = []
 

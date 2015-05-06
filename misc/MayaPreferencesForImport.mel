@@ -1,0 +1,3 @@
+optionVar -iv displayLayerMerge 2;
+editRenderLayerGlobals -mergeType 2;
+print("All Done, import your characters now.\n");

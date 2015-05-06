@@ -1,0 +1,1 @@
+All character's SSS shaders has to be set to Retrace mode instead of old Prepass based aproach.
