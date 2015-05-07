@@ -2,10 +2,9 @@ import maya.cmds as cmds
 import maya.mel
 import os.path
 import utils
-from aau_site import sg
 
 # Reload for debug purposes
-reload(utils)
+# reload(utils)
 
 class App(object):
 
@@ -28,8 +27,10 @@ class App(object):
         self.projectPathTxt = cwd.replace('\\', '/') + '/'
 
         self.envStr = 'Assets/Env/Master/env.ma'
-
         self.camStr = 'Assets/Cam/'
+        self.lightStr = 'Assets/Env/Light/light.ma'
+
+
 
         #Set Cache Variables
         self.charCacheStr = 'Cache/Anm/CHAR/'
@@ -131,9 +132,8 @@ class App(object):
 
         cmds.button(label='ENV', w=40, command=self.import_env)
         cmds.button(label='CAM', w=60, command=self.import_cam)
+        cmds.button(label='LIGHT', w=60, command=self.import_light)
 
-        cmds.text(label='')
-        cmds.text(label='')
 
 
         cmds.button(label='GEO', w=60, h=40, command=self.import_geo)
@@ -166,6 +166,8 @@ class App(object):
 
     def find_shot(self, project_id, shot_code):
 
+        from aau_site import sg
+
         # project_id = 147
         # shot_code = 'SQ05_SH16'
 
@@ -189,12 +191,11 @@ class App(object):
 
         return frame_number
 
-    def import_light():
-        pass
+    def import_light(self, *args):
+        lightScenePath = self.projectPathTxt + self.lightStr
+        cmds.file(lightScenePath, reference=True, defaultNamespace=True)
 
-
-
-            
+         
     def import_cam(self, *args):
         camPath = self.projectPathTxt + self.camStr + 'SQ' + self.context()['sequence'] + '/' + 'SH' + self.context()['shot'] + '/' + 'SQ' + self.context()['sequence'] + '_' + 'SH' + self.context()['shot'] + '_CAM.fbx'
 

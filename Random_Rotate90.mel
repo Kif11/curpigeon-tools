@@ -1,2 +1,0 @@
-for ($object in `ls -sl -tr`)
-rotate (0) (90*int(`rand -4 4`)) (0) $object;

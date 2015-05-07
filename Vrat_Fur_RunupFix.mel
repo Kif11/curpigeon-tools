@@ -1,1 +1,0 @@
-putenv("MAYA_DISABLE_BATCH_RUNUP","1"); global proc dynRunupForBatchRender() {}; print("Vray FUR optimized.\n");

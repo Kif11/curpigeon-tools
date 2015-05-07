@@ -1,5 +1,0 @@
-optionVar -iv displayLayerMerge 2;
-editRenderLayerGlobals -mergeType 2;
-savePrefsChanges;
-saveToolSettings;
-saveViewportSettings;

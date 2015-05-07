@@ -27,7 +27,9 @@ os.environ['MAYA_SCRIPT_PATH'] = scripts_dir
 for path in maya_user_prefs:
 	# Check if directory is exist use it
 	if os.path.exists(path):
+		print "User pref", path
 		os.environ['MAYA_APP_DIR'] = path
 
 # Run application
+print os.environ['MAYA_APP_DIR']
 subprocess.Popen(maya_exec)

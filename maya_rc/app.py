@@ -2,11 +2,9 @@ import maya.cmds as cmds
 import os
 import shutil
 
-# Define an empty list to store all external paths
-path_list = []
 
 # Given list of texture pathes will find the uvtiled one 
-# and replace them wiht expanded version
+# and replace them wiht expanded versions
 def expand_uv_tiles(path_list):
 
 	for path in path_list:
@@ -16,23 +14,26 @@ def expand_uv_tiles(path_list):
 		# For mary uvtiled textures
 		if mary_tile in path:
 
-			# Remove path from the list
+			# Remove original unexpanded path from the list
 			path_list.remove(path)
 
-			utile = 1
-			vtile = 1
+			# Split path into name components
 			root, fila_name = os.path.split(path)
 			name, ext = os.path.splitext(fila_name)
 
+			# Remove uvtile expresion from name
 			name = name.replace(mary_tile, '')
 
+			# List all files in this directory
 			files = os.listdir(root)
 
+			# If file name match to original uvtile name
+			# append it to path  
 			for f in files:
 				if f.startswith(name):
 					path_list.append(os.path.join(root, f))
 
-			return path_list
+	return path_list
 
 # Return a list of all absolute texture path in the scene
 def texture_paths():
@@ -51,33 +52,30 @@ def texture_paths():
 
 def geo_paths():
 
-	# VRayMesh
-	VRayCacheFiles = cmds.ls(type = "VRayMesh")
+	vray_meshes = [cmds.getAttr(node + ".fileName") for node in cmds.ls(type = "VRayMesh")]
+	alembic_caches = [cmds.getAttr(node + ".abc_File") for node in cmds.ls(type = "AlembicNode")]
 
-	for node in VRayCacheFiles:
-		path_list.append(cmds.getAttr(node + ".fileName"))
+	return vray_meshes + alembic_caches
 
-	# Alembic Cache
-	alembicCache = cmds.ls(type = "AlembicNode")
+# Return a list of file path from all referenc node in the scene
+def references_paths():
+	
+	# Using python list comprehension to construct a list
+	return [cmds.referenceQuery(node, filename=True) for node in cmds.ls(references=True)]
+    	
 
-	for node in alembicCache:
-		path_list.append(cmds.getAttr(node + ".abc_File"))
-
-	return path_list
-
-def copy_external_assets(path_list):
+def copy_external_assets(new_project, path_list):
 
 	cur_project_dir = cmds.workspace(q=True, rd=True)
-	new_project_dir = 'G:/SQ05/SH16'
 
 	# Create new project dir if doesn't exist
-	if not os.path.exists(new_project_dir):
-		os.makedirs(new_project_dir)
+	if not os.path.exists(new_project):
+		os.makedirs(new_project)
 
 	for path in path_list:
 		# Validate that the file exist
 		if os.path.exists(path):
-			new_path = path.replace(cur_project_dir, new_project_dir)
+			new_path = path.replace(cur_project_dir, new_project)
 			new_path = new_path.replace('\\', '/')
 
 			# Create folders for current file
@@ -91,31 +89,16 @@ def copy_external_assets(path_list):
 			else:
 				print new_path, "- File already exist"
 
-def scene_path():
-	scene_path = cmds.file(q=True, expandName=True)
-	path_list.append(scene_path)
-
 
 def main():
 
-	# Add all the texture to path_list
-	expand_uv_tiles(texture_paths())
-	# Add all the geo in the list
-	geo_paths()
-	# Add scene
-	scene_path()
+	scene_path = cmds.file(q=True, expandName=True)
+
+	path_list = expand_uv_tiles(texture_paths() + geo_paths() + references_paths() + scene_path)
 
 	# Copy to a new location
-	copy_external_assets(path_list)
+	copy_external_assets('G:/SQ05/SH16', path_list)
 
 	print 'DONE!'
 
 main()
-
-
-'''
-# retrieve a string array of all files referenced in the scene
-#
-cmds.file( q=True, l=True )
-# Result: C:/maya/projects/default/scenes/fred.ma C:/mystuff/wilma.mb C:/maya/projects/default/scenes/barney.ma
-'''
