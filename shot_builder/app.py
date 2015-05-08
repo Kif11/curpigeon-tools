@@ -52,7 +52,7 @@ class App(object):
         self.raggedyFull = self.projectPathTxt + raggedyPath  
 
         scrawnyPath = 'Assets/Char/Geo/Pigeons/Scrawny/GEO_Scrawny.ma'
-        scrawnyFull = self.projectPathTxt + scrawnyPath
+        self.scrawnyFull = self.projectPathTxt + scrawnyPath
 
         #Set Humans Variables
         georgePath = 'Assets/Char/Geo/Humans/George/GEO_George.ma'
@@ -363,24 +363,24 @@ class App(object):
         # HUMANS
         if (georgeValue):
             # cmds.file( self.georgeFull, i=True )
-            cmds.file(self.georgeFull, reference=True, defaultNamespace=True)
+            cmds.file(self.georgeFull, reference=True, mergeNamespacesOnClash=True, defaultNamespace=True)
             
         if (ernestValue): #Rocky ABC
             # cmds.file( self.ernestFull, i=True )
-            cmds.file(self.ernestFull, reference=True, defaultNamespace=True)
+            cmds.file(self.ernestFull, reference=True, mergeNamespacesOnClash=True, defaultNamespace=True)
             
         if (vincentValue): #Rocky ABC
             # cmds.file( self.vincentFull, i=True )
-            cmds.file(self.vincentFull, reference=True, defaultNamespace=True)
+            cmds.file(self.vincentFull, reference=True, mergeNamespacesOnClash=True, defaultNamespace=True)
             
         if (joeValue): #Rocky ABC
             # cmds.file( self.joeFull, i=True )
-            cmds.file(self.joeFull, reference=True, defaultNamespace=True)
+            cmds.file(self.joeFull, reference=True, mergeNamespacesOnClash=True, defaultNamespace=True)
             
         if (tomValue): #Rocky ABC
             # cmds.file( self.tomFull, i=True )
-            cmds.file(self.tomFull, reference=True, defaultNamespace=True)
+            cmds.file(self.tomFull, reference=True, mergeNamespacesOnClash=True, defaultNamespace=True)
             
         if (bobValue): #Rocky ABC
             # cmds.file( self.bobFull, i=True )
-            cmds.file(self.bobFull, reference=True, defaultNamespace=True)
+            cmds.file(self.bobFull, reference=True, mergeNamespacesOnClash=True, defaultNamespace=True)

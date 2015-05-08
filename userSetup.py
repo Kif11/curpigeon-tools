@@ -4,6 +4,8 @@ import maya.mel
 import shot_builder.app as sb
 import kk_tools.app as kk
 
+reload(sb)
+
 # Create custome main menu
 def create_menu():
 
