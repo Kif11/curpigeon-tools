@@ -32,7 +32,8 @@ def project_cleanup():
 				 'images',
 				 'qubetmpfile',
 				 'sound',
-				 'Keyboard']
+				 'Keyboard',
+				 'DS_Store']
 
 	file_list = []
 

@@ -43,6 +43,36 @@ def remove_namespaces():
 	return 0
 
 
+def set_tag(nodes, tag):
+
+	for node in nodes:
+		try:
+			cmds.addAttr(node, longName='tag', dt='string')
+			cmds.setAttr(node + '.tag', tag, type='string')
+		except:
+			print 'Can not set tag for', node
+			pass
+
+	return nodes
+
+
+def reference(scene):
+
+	objects = cmds.file(scene, reference=True, defaultNamespace=True, returnNewNodes=True)
+
+	return objects
+
+
+def create_render_layers():
+
+	render_layers = ['FG', 'BG', 'SHD', 'zDepth']
+	scene_render_layers = cmds.ls(type='renderLayer')
+
+	for layer in render_layers:
+		if layer not in scene_render_layers:
+			cmds.createRenderLayer(name=layer)
+
+
 # Debug
 # file_name = '//netapp/collab/tbertino_Curpigeon_/Curpigeon_Project/Scenes/SQ05/SH16/maya/SQ05_SH16_02_KIR.ma'
 # print extract_context(file_name)

@@ -44,3 +44,5 @@ def backup_all_characters():
 	for char_type in characters.keys():
 		for char in characters[char_type]:
 			backup_char(char_type, char)
+
+backup_all_characters()
