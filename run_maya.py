@@ -8,9 +8,7 @@ cwd = os.getcwd()
 maya_exec = 'C:/Program Files/Autodesk/Maya2015/bin/maya.exe'
 
 # Semicolon separated string of all script paths 
-scripts_dir = os.pathsep.join([os.path.dirname(os.path.realpath(__file__)).replace("\\","/"), 
-							   os.path.join(cwd, 'Scripts')
-							  ])
+scripts_dir = os.path.dirname(os.path.realpath(__file__)).replace("\\","/")
 
 # List of paths where maya are going to look for user preferences
 maya_user_prefs = ['H:/Code/Python/kk-maya-launcher/config/user_prefs/maya', 

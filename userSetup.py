@@ -13,6 +13,8 @@ def create_menu():
 	oMenu= cmds.menu(parent=gMainWindow, tearOff = True, label = 'Curpigeon')
 
 	# Populate menu with elements
+	cmds.menuItem(parent=oMenu, label='DEV', divider=True)
+
 	cmds.menuItem(parent=oMenu, label='Shot Builder', command='sb.App()')
 
 	cmds.menuItem(parent=oMenu, label='TOOLS', divider=True)
