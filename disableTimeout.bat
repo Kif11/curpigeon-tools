@@ -1,1 +1,0 @@
-powercfg -x -disk-timeout-ac 0

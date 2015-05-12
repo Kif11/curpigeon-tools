@@ -32,6 +32,7 @@ class App(object):
 		# Project path
 		self.cwd = os.getcwd().replace('\\', '/')
 		self.project_path = self.cwd.replace('\\', '/')
+		self.app_dir = os.path.dirname(os.path.realpath(__file__)).replace("\\","/")
 
 		self.envStr = 'Assets/Env/Master/env.ma'
 
@@ -93,12 +94,14 @@ class App(object):
 		cmds.button(label='GEO', w=60, h=40, command=self.import_geo)
 		cmds.button(label='ABC', w=60, command=self.import_abc)
 
-		cmds.button(label='LAYERS', w=40, command=self.configure_layers)
+		cmds.button(label='MAKE LAYERS', w=100, command=self.configure_layers)
+		cmds.button(label='SET RENDER', w=100, command=self.configure_render)
 		
 		cmds.showWindow(flWin)
 
 	# Return curent sequnce and shot number specified in corespondin fields
 	def context(self):
+
 		sequence = cmds.textField(self.stringSQ, q=True, text=True )
 		shot = cmds.textField(self.stringSH, q=True, text=True )
 
@@ -265,8 +268,6 @@ class App(object):
 
 	def import_abc (self, *args):
 
-		print self.cache_paths(self.context()['sequence'], self.context()['shot'])
-
 		for char, value in self.char_values().items():
 			if value:
 				maya.mel.eval('AbcImport -mode import -connect "/"' + '"' + self.cache_paths(self.context()['sequence'], self.context()['shot'])[char] + '";')
@@ -377,9 +378,25 @@ class App(object):
 
 		            #cmds.hyperShade(a='test_mat')
 
-	def configure_render(self):
+	def configure_render(self, *args):
 
-		pass
+		sequence = self.context()['sequence']
+		shot = self.context()['shot']
+
+		vr_setings_node = 'vraySettings'
+
+		# Delete vray settings node if alredy exist
+		if cmds.objExists(vr_setings_node):
+			cmds.delete(vr_setings_node)
+
+		vr_settings_file = '%s/lib/vray_settings.ma' % self.app_dir
+
+		# Impor a new vray settings node
+		cmds.file(vr_settings_file, i=True)
+
+		# Set render output path
+		render_output = 'SH%02d/SQ%02d/<Layer>/SH%02d_SQ%02d' % (sequence, shot, sequence, shot)
+		cmds.setAttr(vr_setings_node + '.fileNamePrefix', render_output, type='string')
 
 		# preset_path = self.cwd + '/Scripts/shot_builder/lib/vray_settings.mel'
 
@@ -401,10 +418,6 @@ class App(object):
 
 		# for field, value in settings.items():
 		# 	cmds.setAttr(vr_settings_node + '.' + field, value)
-
-		# # Set render output path
-		# render_output = '%02d_%02d' % (sequence, shot)
-		# cmds.setAttr(vr_settings_node + '.fileNamePrefix', render_output, type='string')
 
 	def enable_element(self, layer, args):
 
