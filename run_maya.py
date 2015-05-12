@@ -14,12 +14,14 @@ scripts_dir = os.path.dirname(os.path.realpath(__file__)).replace("\\","/")
 maya_user_prefs = ['H:/Code/Python/kk-maya-launcher/config/user_prefs/maya', 
 				   'F:/Code/Python/kk-maya-launcher/config/user_prefs/maya',
 				   'G:/Code/Python/kk-maya-launcher/config/user_prefs/maya',
+				   'J:/Code/Python/kk-maya-launcher/config/user_prefs/maya',
 				   'G:/maya']
 
 # Set up environmental variables
 os.environ['MAYA_PROJECT'] = cwd
 os.environ['PYTHONPATH'] = scripts_dir
 os.environ['MAYA_SCRIPT_PATH'] = scripts_dir
+os.environ['MAYA_PRESET_PATH'] = scripts_dir + '/presets'
 
 # Iterate trough the list of user preferences directory
 for path in maya_user_prefs:
