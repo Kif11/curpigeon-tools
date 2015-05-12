@@ -35,7 +35,7 @@ def remove_namespaces():
 	countNS = len(nameSpaceArray)
 
 	for i in range(0, countNS):
-	    cmds.namespace( removeNamespace = ':'+ nameSpaceArray[i], mergeNamespaceWithRoot = True)
+		cmds.namespace( removeNamespace = ':'+ nameSpaceArray[i], mergeNamespaceWithRoot = True)
 
 	if (countNS):
 		remove_namespaces()
@@ -62,16 +62,24 @@ def reference(scene):
 
 	exists = False
 	for node in scene_references:
-	    if scene == cmds.referenceQuery(node, filename=True):
-	    	exists = True
-	    	print node, 'Already exists in the scene'
-	    	return 0
+
+		try:
+			reference_file = cmds.referenceQuery(node, filename=True)
+
+			if scene == cmds.referenceQuery(node, filename=True):
+				exists = True
+				print node, 'Already exists in the scene'
+				return 0
+
+		# To handle this runtime error
+		# RuntimeError: Reference node 'Turntable_VrayRN' is not associated with a reference file. # 
+		except RuntimeError:
+			print node, 'is not associated with a reference file'
+			pass
 
 	if not exists:
 		objects = cmds.file(scene, reference=True, defaultNamespace=True, returnNewNodes=True)
 		return objects
-
-
 
 
 def create_render_layers():
