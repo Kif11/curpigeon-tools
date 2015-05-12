@@ -58,9 +58,20 @@ def set_tag(nodes, tag):
 
 def reference(scene):
 
-	objects = cmds.file(scene, reference=True, defaultNamespace=True, returnNewNodes=True)
+	scene_references = cmds.ls(references=True)
 
-	return objects
+	exists = False
+	for node in scene_references:
+	    if scene == cmds.referenceQuery(node, filename=True):
+	    	exists = True
+	    	print node, 'Already exists in the scene'
+	    	return 0
+
+	if not exists:
+		objects = cmds.file(scene, reference=True, defaultNamespace=True, returnNewNodes=True)
+		return objects
+
+
 
 
 def create_render_layers():

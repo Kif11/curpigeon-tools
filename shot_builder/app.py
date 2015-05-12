@@ -34,11 +34,12 @@ class App(object):
 		self.project_path = self.cwd.replace('\\', '/')
 
 		self.envStr = 'Assets/Env/Master/env.ma'
-		self.camStr = 'Assets/Cam/'
+
 		self.lightStr = 'Assets/Env/Light/light.ma'
 
 		# Initilize UI
 		self.ui()
+
 
 	def ui(self):
 
@@ -92,7 +93,7 @@ class App(object):
 		cmds.button(label='GEO', w=60, h=40, command=self.import_geo)
 		cmds.button(label='ABC', w=60, command=self.import_abc)
 
-		cmds.button(label='SHD', w=40, command=self.shadow_layer)
+		cmds.button(label='LAYERS', w=40, command=self.configure_layers)
 		
 		cmds.showWindow(flWin)
 
@@ -100,9 +101,18 @@ class App(object):
 	def context(self):
 		sequence = cmds.textField(self.stringSQ, q=True, text=True )
 		shot = cmds.textField(self.stringSH, q=True, text=True )
+
+
+		if shot == '' or sequence == '':
+			print 'Specify your shot and sequence first'
+
+			# TODO:(kirill) Need to breake here somehow???
+			return 0
+
 		shot_code = 'SQ' + sequence + '_' + 'SH' + shot
-		return {'sequence': sequence,
-				'shot': shot, 
+
+		return {'sequence': int(sequence),
+				'shot': int(shot), 
 				'shot_code': shot_code}
 
 	# Return dictionary of char name : path to character geo file
@@ -133,13 +143,13 @@ class App(object):
 		for kind in self.characters:
 			for char in self.characters[kind]:
 
-				paths[char] = '%s/%s/SQ%s/SH%s/SQ%s_SH%s_%s.abc' % (self.project_path, 
-																		char_cache_dir, 
-																		sequence,
-																		shot,
-																		sequence,
-																		shot,
-																		char)
+				paths[char] = '%s/%s/SQ%02d/SH%02d/SQ%02d_SH%02d_%s.abc' % (self.project_path, 
+																			char_cache_dir, 
+																			sequence,
+																			shot,
+																			sequence,
+																			shot,
+																			char)
 		return paths
 
 	# Return dictionary of boolean values of character checkboxes
@@ -198,23 +208,38 @@ class App(object):
 	# Importa main light rig
 	def import_light(self, *args):
 
-		lightScenePath = self.project_path + self.lightStr
+		lightScenePath = '%s/%s' % (self.project_path, 
+									self.lightStr)
 
 		objects = utils.reference(lightScenePath)
 
-		# Assign tag
-		utils.set_tag(objects, 'light')
+		if objects:
+			# Assign tag
+			utils.set_tag(objects, 'light')
 
 		 
 	def import_cam(self, *args):
 
-		camPath = self.project_path + '/' + self.camStr + 'SQ' + self.context()['sequence'] + '/' + 'SH' + self.context()['shot'] + '/' + 'SQ' + self.context()['sequence'] + '_' + 'SH' + self.context()['shot'] + '_CAM.fbx'
+		sequence = self.context()['sequence']
+		shot = self.context()['shot']
 
-		print camPath
+		cam_dir = '%s/Assets/Cam/SQ%02d/SH%02d' % (self.project_path,
+													sequence,
+													shot)
 
-		melCmd = 'FBXImport -file "%s"' % camPath
+		files = os.listdir(cam_dir)
 
-		maya.mel.eval(melCmd)
+		for f in files:
+			if os.path.splitext(f)[1] == '.fbx':
+				cam_path = '%s/%s' % (cam_dir, f)
+			else:
+				print 'No FBX files found'
+
+		cmd = 'FBXImport -file "%s"' % cam_path
+
+		print 'Executing ', cmd
+
+		maya.mel.eval(cmd)
 
 		# Remove namespaces
 		utils.remove_namespaces()
@@ -227,14 +252,15 @@ class App(object):
 		# Reference the environment file
 		objects = utils.reference(env_path)
 		
-		# Assign tag
-		utils.set_tag(objects, 'env')
+		if objects:
+			# Assign tag
+			utils.set_tag(objects, 'env')
 
-		# Create render layers
-		utils.create_render_layers()
+			# Create render layers
+			utils.create_render_layers()
 
-		# Set render layer
-		cmds.editRenderLayerMembers('BG', objects)
+			# Set render layer
+			cmds.editRenderLayerMembers('BG', objects)
 
 
 	def import_abc (self, *args):
@@ -248,30 +274,41 @@ class App(object):
 
 	def import_geo(self, *args):
 
+		# Configure render settings
+		self.configure_render()
+
+		# Create render layers if do not exists
+		utils.create_render_layers()
+
 		for char, value in self.char_values().items():
 			if value:
 				objects = utils.reference(self.geo_paths()[char])
-				cmds.editRenderLayerMembers('FG', objects)
 
 				# Assign tag
-				utils.set_tag(objects, 'char')
+				if objects:
+					utils.set_tag(objects, 'char')
+					cmds.editRenderLayerMembers('FG', objects)
 
 
-	def shadow_layer(self, *args):
+	def configure_layers(self, *args):
 
 		mate_shaders = self.cwd + '/Scripts/shot_builder/lib/shadow_layer_mtl.ma'
 
 		scene_references = cmds.ls(references=True)
 
-		# Import reference if not already exist
-		# TODO(kirill): Make it global for all reference import
-		ref_in_scene = False
-		for node in scene_references:
-		    if mate_shaders == cmds.referenceQuery(node, filename=True):
-		    	ref_in_scene = True
-		
-		if not ref_in_scene:
-			utils.reference(mate_shaders)
+		# Reference shader file
+		utils.reference(mate_shaders)
+
+		# Create render layers if do not exists
+		utils.create_render_layers()
+
+		##### FG Layer #####
+		self.enable_element('FG', {'char': True, 'env': False})
+
+		##### FG Layer #####
+		self.enable_element('BG', {'char': False, 'env': True})
+
+		##### SHD Layer #####
 
 		# List of all objects on FG layer
 		fg_objects = cmds.editRenderLayerMembers('FG', fullNames=True, query=True)
@@ -292,11 +329,44 @@ class App(object):
 		# Set currendt layer to SHD
 		cmds.editRenderLayerGlobals(currentRenderLayer='SHD')
 
-		for node in bg_objects:
+		if bg_objects:
+			for node in bg_objects:
+				cmds.select(node)
+				cmds.hyperShade(a='vray_wrapper')
+
+		self.enable_element('SHD', {'char': False, 'env': False})
+
+
+		##### zDepth Layer #####
+
+		# List of all objects on master layer
+		all_objects = cmds.ls(type='transform')
+
+		# Move to SHD layer
+		cmds.editRenderLayerMembers('zDepth', all_objects)
+
+		# Set currendt layer to zDepth
+		cmds.editRenderLayerGlobals(currentRenderLayer='zDepth')
+
+		# Assign matte shader for all objects
+		for node in all_objects:
 			cmds.select(node)
-			cmds.hyperShade(a='vray_wrapper')
+			cmds.hyperShade(a='matte')
+
+		self.enable_element('zDepth', {'char': False, 'env': False})
 
 
+		# Create zDepth render element
+		zdepth_name = 'vrayRE_Z_depth'
+		if not cmds.objExists(zdepth_name):
+			maya.mel.eval('vrayAddRenderElement zdepthChannel;')
+			cmds.editRenderLayerAdjustment(zdepth_name + ".enabled", layer='zDepth')
+			cmds.setAttr(zdepth_name + ".enabled", True)
+		else:
+			print '%s render element already exists' % zdepth_name
+
+		# This is different aproach base on tags
+		#
 		# all_objects = cmds.ls(type='transform')
 
 		# chars = []
@@ -306,3 +376,48 @@ class App(object):
 		#         	chars.append(node)
 
 		            #cmds.hyperShade(a='test_mat')
+
+	def configure_render(self):
+
+		pass
+
+		# preset_path = self.cwd + '/Scripts/shot_builder/lib/vray_settings.mel'
+
+		# cmds.nodePreset(load=True)
+
+		# http://mayafail.blogspot.com/2010/02/mayapresetpath-is-abortion-of-shame.html
+
+		# vr_settings_node = 'vraySettings'
+		# settings = {'width': 1920,
+		# 			'height':1080,
+		# 			'relements_usereferenced': 1,
+		# 			'ddisplac_maxSubdivs': 3
+		# 			'giOn': 0
+		# 			'dmcMaxSubdivs': 8
+		# 			'cam_mbOn': 1
+		# 			'imageFormatStr': 6
+		# 			'ddisplac_maxSubdivs':
+		# 			}
+
+		# for field, value in settings.items():
+		# 	cmds.setAttr(vr_settings_node + '.' + field, value)
+
+		# # Set render output path
+		# render_output = '%02d_%02d' % (sequence, shot)
+		# cmds.setAttr(vr_settings_node + '.fileNamePrefix', render_output, type='string')
+
+	def enable_element(self, layer, args):
+
+		# List all rendet elements
+		elements = cmds.ls(type="VRayRenderElement")
+
+		for element in elements:
+			for tag, enabled in args.items():
+				if cmds.attributeQuery('tag', node=element, exists=True):
+					if cmds.getAttr(element + ".tag") == tag:
+						print layer, tag, enabled, element
+						# Create render layer adjustments 
+						# You still need to be on the layer in order to make an ajusment
+						cmds.editRenderLayerGlobals(currentRenderLayer=layer)
+						cmds.editRenderLayerAdjustment(element + ".enabled", layer=layer)
+						cmds.setAttr(element + ".enabled", enabled)
