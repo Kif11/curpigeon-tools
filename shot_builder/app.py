@@ -379,9 +379,11 @@ class App(object):
 
 	def configure_render(self):
 
-		preset_path = self.cwd + '/Scripts/shot_builder/lib/vray_settings.mel'
+		pass
 
-		cmds.nodePreset(load=True)
+		# preset_path = self.cwd + '/Scripts/shot_builder/lib/vray_settings.mel'
+
+		# cmds.nodePreset(load=True)
 
 		# http://mayafail.blogspot.com/2010/02/mayapresetpath-is-abortion-of-shame.html
 
