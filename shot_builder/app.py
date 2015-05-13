@@ -260,9 +260,10 @@ class App(object):
 			utils.set_tag(objects, 'env')
 
 			# Create render layers
-			utils.create_render_layers()
+			# utils.create_render_layers()
 
-			# Set render layer
+			# Create render layer and assign imported objects to it
+			cmds.createRenderLayer(name='BG')
 			cmds.editRenderLayerMembers('BG', objects)
 
 
@@ -275,11 +276,8 @@ class App(object):
 
 	def import_geo(self, *args):
 
-		# Configure render settings
-		self.configure_render()
-
 		# Create render layers if do not exists
-		utils.create_render_layers()
+		# utils.create_render_layers()
 
 		for char, value in self.char_values().items():
 			if value:
@@ -288,6 +286,9 @@ class App(object):
 				# Assign tag
 				if objects:
 					utils.set_tag(objects, 'char')
+
+					# Create render layer and assign imported objects to it
+					cmds.createRenderLayer(name='FG')
 					cmds.editRenderLayerMembers('FG', objects)
 
 
@@ -311,13 +312,15 @@ class App(object):
 
 		##### SHD Layer #####
 
+		shadow_layer_name = 'SHD'
+
 		# List of all objects on FG layer
 		fg_objects = cmds.editRenderLayerMembers('FG', fullNames=True, query=True)
 		# Move to SHD layer
-		cmds.editRenderLayerMembers('SHD', fg_objects)
+		cmds.editRenderLayerMembers(shadow_layer_name, fg_objects)
 
 		# Set currendt layer to SHD
-		cmds.editRenderLayerGlobals(currentRenderLayer='SHD')
+		cmds.editRenderLayerGlobals(currentRenderLayer=shadow_layer_name)
 
 		for node in fg_objects:
 			cmds.select(node)
@@ -326,25 +329,27 @@ class App(object):
 		# List of all objects on BG layer
 		bg_objects = cmds.editRenderLayerMembers('BG', fullNames=True, query=True)
 		# Move to SHD layer
-		cmds.editRenderLayerMembers('SHD', bg_objects)
+		cmds.editRenderLayerMembers(shadow_layer_name, bg_objects)
 		# Set currendt layer to SHD
-		cmds.editRenderLayerGlobals(currentRenderLayer='SHD')
+		cmds.editRenderLayerGlobals(currentRenderLayer=shadow_layer_name)
 
 		if bg_objects:
 			for node in bg_objects:
 				cmds.select(node)
 				cmds.hyperShade(a='vray_wrapper')
 
-		self.enable_element('SHD', {'char': False, 'env': False})
+		self.enable_element(shadow_layer_name, {'char': False, 'env': False})
 
 
 		##### zDepth Layer #####
+
+		zdepth_layer_name = 'zDepth'
 
 		# List of all objects on master layer
 		all_objects = cmds.ls(type='transform')
 
 		# Move to SHD layer
-		cmds.editRenderLayerMembers('zDepth', all_objects)
+		cmds.editRenderLayerMembers(zdepth_layer_name, all_objects)
 
 		# Set currendt layer to zDepth
 		cmds.editRenderLayerGlobals(currentRenderLayer='zDepth')
@@ -354,17 +359,22 @@ class App(object):
 			cmds.select(node)
 			cmds.hyperShade(a='matte')
 
-		self.enable_element('zDepth', {'char': False, 'env': False})
-
+		self.enable_element(zdepth_layer_name, {'char': False, 'env': False})
 
 		# Create zDepth render element
 		zdepth_name = 'vrayRE_Z_depth'
 		if not cmds.objExists(zdepth_name):
 			maya.mel.eval('vrayAddRenderElement zdepthChannel;')
-			cmds.editRenderLayerAdjustment(zdepth_name + ".enabled", layer='zDepth')
+			cmds.editRenderLayerAdjustment(zdepth_name + ".enabled", layer=zdepth_layer_name)
 			cmds.setAttr(zdepth_name + ".enabled", True)
 		else:
 			print '%s render element already exists' % zdepth_name
+
+
+		# Disable all dome lights on the zdepth and shadow render layers
+		utils.set_layer_attr('VRayLightDomeShape', 'enabled', False, zdepth_layer_name)
+		utils.set_layer_attr('VRayLightDomeShape', 'enabled', False, shadow_layer_name)
+
 
 		# This is different aproach base on tags
 		#
