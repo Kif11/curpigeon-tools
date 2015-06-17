@@ -1,5 +1,6 @@
 import maya.cmds as cmds
 import os
+import random
 
 # Align two objects
 def align():

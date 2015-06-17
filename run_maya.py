@@ -31,5 +31,4 @@ for path in maya_user_prefs:
 		os.environ['MAYA_APP_DIR'] = path
 
 # Run application
-print os.environ['MAYA_APP_DIR']
 subprocess.Popen(maya_exec)

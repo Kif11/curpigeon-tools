@@ -43,6 +43,7 @@ def remove_namespaces():
 	return 0
 
 
+# Set tag attribute for given list of nodes
 def set_tag(nodes, tag):
 
 	for node in nodes:
@@ -54,6 +55,39 @@ def set_tag(nodes, tag):
 			pass
 
 	return nodes
+
+
+# Return a list of objects that have matching tag attribute
+def list_by_tag(tag, **kwargs):
+    
+    selection = cmds.ls(**kwargs)
+    
+    nodes = []
+    
+    for node in selection:
+        try:
+            object_tag = cmds.getAttr(node + '.tag')
+        except:
+            object_tag = ''
+            pass
+        if tag == object_tag:
+            nodes.append(node)
+            
+    return nodes
+
+
+# Take a list of object and return root parent for each one
+def get_roots(nodes):
+    roots = []
+    for node in nodes:
+        try:
+            root = '|' + cmds.listRelatives(node, allParents=True, fullPath=True)[0].split('|')[1]
+            roots.append(root)
+        except:
+            pass
+    
+    # Return list with removed dublicates
+    return list(set(roots))
 
 
 def reference(scene):
@@ -82,12 +116,11 @@ def reference(scene):
 		return objects
 
 
-def create_render_layers():
+def create_render_layers(names):
 
-	render_layers = ['FG', 'BG', 'SHD', 'zDepth']
 	scene_render_layers = cmds.ls(type='renderLayer')
 
-	for layer in render_layers:
+	for layer in names:
 		if layer not in scene_render_layers:
 			cmds.createRenderLayer(name=layer)
 

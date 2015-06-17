@@ -263,7 +263,7 @@ class App(object):
 			# utils.create_render_layers()
 
 			# Create render layer and assign imported objects to it
-			cmds.createRenderLayer(name='BG')
+			utils.create_render_layers(['BG'])
 			cmds.editRenderLayerMembers('BG', objects)
 
 
@@ -288,7 +288,7 @@ class App(object):
 					utils.set_tag(objects, 'char')
 
 					# Create render layer and assign imported objects to it
-					cmds.createRenderLayer(name='FG')
+					utils.create_render_layers(['FG'])
 					cmds.editRenderLayerMembers('FG', objects)
 
 
@@ -301,64 +301,70 @@ class App(object):
 		# Reference shader file
 		utils.reference(mate_shaders)
 
-		# Create render layers if do not exists
-		utils.create_render_layers()
+		# Create render layers if not exist
+		utils.create_render_layers(['FG', 'BG', 'SHD', 'zDepth'])
 
-		##### FG Layer #####
-		self.enable_element('FG', {'char': True, 'env': False})
+		##### FG START #####
+		fg_layer_name = 'FG'
+		# Configure vray render elements
+		self.enable_element(fg_layer_name, {'char': True, 'env': False})
+		# List all object with 'char' tag attribute
+		fg_objects = utils.list_by_tag('char', type='transform')
+		# Move to FG layer
+		cmds.editRenderLayerMembers(fg_layer_name, utils.get_roots(fg_objects), noRecurse=True)
+		##### FG END #####
 
-		##### FG Layer #####
-		self.enable_element('BG', {'char': False, 'env': True})
 
-		##### SHD Layer #####
+		##### BG START #####
+		bg_layer_name = 'BG'
+		self.enable_element(bg_layer_name, {'char': False, 'env': True})
+		bg_objects = utils.list_by_tag('env', type='transform')
+		cmds.editRenderLayerMembers(bg_layer_name, utils.get_roots(bg_objects), noRecurse=True)
+		##### BG END #####
+		
 
+		##### SHD START #####
 		shadow_layer_name = 'SHD'
 
-		# List of all objects on FG layer
-		fg_objects = cmds.editRenderLayerMembers('FG', fullNames=True, query=True)
-		# Move to SHD layer
-		cmds.editRenderLayerMembers(shadow_layer_name, fg_objects)
+		# Move to foreground and background objects to SHD layer
+		cmds.editRenderLayerMembers(shadow_layer_name, utils.get_roots(fg_objects), noRecurse=True)
+		cmds.editRenderLayerMembers(shadow_layer_name, utils.get_roots(bg_objects), noRecurse=True)
 
 		# Set currendt layer to SHD
 		cmds.editRenderLayerGlobals(currentRenderLayer=shadow_layer_name)
 
+		# Assign matte material to foreground objects
 		for node in fg_objects:
 			cmds.select(node)
 			cmds.hyperShade(a='matte')
+		# Assign vray_wrapper material to background objects
+		for node in bg_objects:
+			cmds.select(node)
+			cmds.hyperShade(a='vray_wrapper')
 
-		# List of all objects on BG layer
-		bg_objects = cmds.editRenderLayerMembers('BG', fullNames=True, query=True)
-		# Move to SHD layer
-		cmds.editRenderLayerMembers(shadow_layer_name, bg_objects)
-		# Set currendt layer to SHD
-		cmds.editRenderLayerGlobals(currentRenderLayer=shadow_layer_name)
-
-		if bg_objects:
-			for node in bg_objects:
-				cmds.select(node)
-				cmds.hyperShade(a='vray_wrapper')
-
+		# Configure vray render elements
 		self.enable_element(shadow_layer_name, {'char': False, 'env': False})
+		# Disable all dome lights
+		utils.set_layer_attr('VRayLightDomeShape', 'enabled', False, shadow_layer_name)
+		##### SHD END #####
 
 
-		##### zDepth Layer #####
-
+		##### zDepth START #####
 		zdepth_layer_name = 'zDepth'
 
-		# List of all objects on master layer
-		all_objects = cmds.ls(type='transform')
-
-		# Move to SHD layer
-		cmds.editRenderLayerMembers(zdepth_layer_name, all_objects)
+ 		# Move to foreground and background objects to zDepth layer
+		cmds.editRenderLayerMembers(zdepth_layer_name, utils.get_roots(fg_objects), noRecurse=True)
+		cmds.editRenderLayerMembers(zdepth_layer_name, utils.get_roots(bg_objects), noRecurse=True)
 
 		# Set currendt layer to zDepth
 		cmds.editRenderLayerGlobals(currentRenderLayer='zDepth')
 
-		# Assign matte shader for all objects
-		for node in all_objects:
+		# Assign matte shader for FG and BG objects
+		for node in fg_objects + bg_objects:
 			cmds.select(node)
 			cmds.hyperShade(a='matte')
 
+		# Configure vray render elements
 		self.enable_element(zdepth_layer_name, {'char': False, 'env': False})
 
 		# Create zDepth render element
@@ -369,24 +375,10 @@ class App(object):
 			cmds.setAttr(zdepth_name + ".enabled", True)
 		else:
 			print '%s render element already exists' % zdepth_name
-
-
-		# Disable all dome lights on the zdepth and shadow render layers
+		# Disable all dome lights
 		utils.set_layer_attr('VRayLightDomeShape', 'enabled', False, zdepth_layer_name)
-		utils.set_layer_attr('VRayLightDomeShape', 'enabled', False, shadow_layer_name)
+		##### zDepth END #####
 
-
-		# This is different aproach base on tags
-		#
-		# all_objects = cmds.ls(type='transform')
-
-		# chars = []
-		# for node in all_objects:
-		#     if cmds.attributeQuery('tag', node=node, exists=True):
-		#         if cmds.getAttr(node + '.tag') == 'char':
-		#         	chars.append(node)
-
-		            #cmds.hyperShade(a='test_mat')
 
 	def configure_render(self, *args):
 
