@@ -397,7 +397,7 @@ class App(object):
 		cmds.file(vr_settings_file, i=True)
 
 		# Set render output path
-		render_output = 'SH%02d/SQ%02d/<Layer>/SH%02d_SQ%02d' % (sequence, shot, sequence, shot)
+		render_output = 'SQ%02d/SH%02d/maya/<Layer>/SQ%02d_SH%02d' % (sequence, shot, sequence, shot)
 		cmds.setAttr(vr_setings_node + '.fileNamePrefix', render_output, type='string')
 
 		# preset_path = self.cwd + '/Scripts/shot_builder/lib/vray_settings.mel'
