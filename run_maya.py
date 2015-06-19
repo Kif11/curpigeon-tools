@@ -10,6 +10,9 @@ maya_exec = 'C:/Program Files/Autodesk/Maya2015/bin/maya.exe'
 # Semicolon separated string of all script paths 
 scripts_dir = os.path.dirname(os.path.realpath(__file__)).replace("\\","/")
 
+# Path to qube submission script files
+qube_dir = scripts_dir + '/qube'
+
 # List of paths where maya are going to look for user preferences
 maya_user_prefs = ['H:/Code/Python/kk-maya-launcher/config/user_prefs/maya', 
 				   'F:/Code/Python/kk-maya-launcher/config/user_prefs/maya',
@@ -20,8 +23,7 @@ maya_user_prefs = ['H:/Code/Python/kk-maya-launcher/config/user_prefs/maya',
 # Set up environmental variables
 os.environ['MAYA_PROJECT'] = cwd
 os.environ['PYTHONPATH'] = scripts_dir
-os.environ['MAYA_SCRIPT_PATH'] = scripts_dir
-os.environ['MAYA_PRESET_PATH'] = scripts_dir + '/presets'
+os.environ['MAYA_SCRIPT_PATH'] = os.pathsep.join([scripts_dir, qube_dir])
 
 # Iterate trough the list of user preferences directory
 for path in maya_user_prefs:

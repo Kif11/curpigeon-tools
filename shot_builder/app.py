@@ -423,7 +423,7 @@ class App(object):
 
 	def enable_element(self, layer, args):
 
-		# List all rendet elements
+		# List all render elements
 		elements = cmds.ls(type="VRayRenderElement")
 
 		for element in elements:
