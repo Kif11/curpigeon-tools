@@ -2,6 +2,7 @@ import maya.utils as utils
 import maya.cmds as cmds
 import maya.mel
 import shot_builder.app as sb
+import shot_builder.utils as sbutils
 import kk_tools.app as kk
 
 reload(sb)
@@ -18,6 +19,7 @@ def create_menu():
 
 	cmds.menuItem(parent=oMenu, label='TOOLS', divider=True)
 
+	cmds.menuItem(parent=oMenu, label='Clean Namespaces', annotation='Remove all namespaces frome scene', command='sbutils.remove_namespaces()')
 	cmds.menuItem(parent=oMenu, label='Align', annotation='Align first selection to second', command='kk.align()')
 	cmds.menuItem(parent=oMenu, label='Clean Object', annotation='Delete history and reset transform', command='kk.clean_up()')
 	cmds.menuItem(parent=oMenu, label='Rename', annotation='Rename selected objects', command='kk.rename()')
