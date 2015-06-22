@@ -31,7 +31,8 @@ class App(object):
 
 		# Project path
 		self.cwd = os.getcwd().replace('\\', '/')
-		self.project_path = self.cwd.replace('\\', '/')
+		# self.project_path = self.cwd.replace('\\', '/')
+		self.project_path = cmds.workspace(q=True, rootDirectory=True)
 		self.app_dir = os.path.dirname(os.path.realpath(__file__)).replace("\\","/")
 
 		self.envStr = 'Assets/Env/Master/env.ma'
@@ -325,7 +326,6 @@ class App(object):
 
 		##### SHD START #####
 		shadow_layer_name = 'SHD'
-
 		# Move to foreground and background objects to SHD layer
 		cmds.editRenderLayerMembers(shadow_layer_name, utils.get_roots(fg_objects), noRecurse=True)
 		cmds.editRenderLayerMembers(shadow_layer_name, utils.get_roots(bg_objects), noRecurse=True)
@@ -387,17 +387,20 @@ class App(object):
 
 		vr_setings_node = 'vraySettings'
 
+		''' This is crush maya on save
+
 		# Delete vray settings node if alredy exist
 		if cmds.objExists(vr_setings_node):
 			cmds.delete(vr_setings_node)
 
 		vr_settings_file = '%s/lib/vray_settings.ma' % self.app_dir
 
-		# Impor a new vray settings node
+		# Import a new vray settings node
 		cmds.file(vr_settings_file, i=True)
+		'''
 
 		# Set render output path
-		render_output = 'SQ%02d/SH%02d/maya/<Layer>/SQ%02d_SH%02d' % (sequence, shot, sequence, shot)
+		render_output = 'SQ%02d/SH%02d/maya/%%s/<Layer>/%%s' % (sequence, shot)
 		cmds.setAttr(vr_setings_node + '.fileNamePrefix', render_output, type='string')
 
 		# preset_path = self.cwd + '/Scripts/shot_builder/lib/vray_settings.mel'
