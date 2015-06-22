@@ -49,7 +49,11 @@ def project_cleanup():
 		for path in file_list:
 			if re.search(name, path):
 				new_path = path.replace(cwd, deleted_dir)
-				shutil.move(path, new_path)
-				print path, 'moved to %s' %new_path
+				try:
+					shutil.move(path, new_path)
+					print path, 'moved to %s' %new_path
+				except:
+					print path, 'can not be moved'
+					pass
 
 project_cleanup()

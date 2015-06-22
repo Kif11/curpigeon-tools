@@ -1,0 +1,296 @@
+// -----------------------------
+//  $Revision: #1 $
+//  $Change: 12648 $
+// -----------------------------
+
+//
+// Add Maya menu items for Qube "Maya (AppFinder) Batch Render" jobs, which use Qube's "appFinder" jobtype.
+// This jobtype differs from the cmdrange "batch render" jobtype in that the submitting user does
+// not have to know the path to the maya executable on the worker, which also allows the appFinder
+// jobs to run on workers with a mixed set of OS's.
+//
+// PipelineFX
+//
+
+// The global proc defined here is called by qube_addUI_menuCore, which in turn is called from
+// userSetup.mel at Maya startup.
+//
+
+// Location of userSetup.mel:
+//      * Windows: (Users Documents Directory)\maya\<Version>\scripts
+//      * Mac OS X: ~/Library/Preferences/Autodesk/maya/<version>/scripts.
+//      * Linux: ~/maya/<version>/scripts.
+//
+
+
+//
+// qube_addUI_appFinder()
+//
+global proc qube_addUI_appFinder()
+{
+    global string $gQubeMenu;
+    global string $gQube_cmdTemplate;
+
+    setParent -menu $gQubeMenu;
+
+    // Add menuitems
+    print ("Adding Qube mayabatch menuitems to Qube! menu\n");
+
+    // --------------------------------------------------------------------------------
+    //      Submit Batch Current Renderer...
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+            menuItem        -label "Submit AppFinder Batch Current Renderer..."
+                            -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (\"+`qube_getCurrentRendererShortname`+\")', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                            -annotation "Render current scene with current renderer through Qube using the appropriate Mayabatch SimpleCmd that exposes all commandline render options"
+                            -echoCommand true
+                             qube_submitAppFinderRender;
+    } else {
+            menuItem        -label "Submit AppFinder Batch Current Renderer..."
+                            -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (\"+`qube_getCurrentRendererShortname`+\")', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                            -annotation "Render current scene with current renderer through Qube using the appropriate Mayabatch SimpleCmd that exposes all commandline render options"
+                            -echoCommand true
+                             qube_submitAppFinderRender;
+    }
+
+    // --------------------------------------------------------------------------------
+    //      Submit Batch Renderer sub-menu
+    // --------------------------------------------------------------------------------
+    menuItem -subMenu true -label "Submit AppFinder Batch Render" qube_submitAppFinderCurrentRendererMenu;
+
+    // --------------------------------------------------------------------------------
+    //      3delight 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render 3delight..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (3delight)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with 3delight renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_3delight;
+    } else {
+        menuItem    -label "Render 3delight..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (3delight)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with 3delight renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_3delight;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      arnold 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render arnold..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (arnold)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with arnold renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_arnold;
+    } else {
+        menuItem    -label "Render arnold..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (arnold)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with arnold renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_arnold;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      file 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render file..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (file)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with file renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_file;
+    } else {
+        menuItem    -label "Render file..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (file)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with file renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_file;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      hw 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render hw..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (hw)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with hw renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_hw;
+    } else {
+        menuItem    -label "Render hw..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (hw)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with hw renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_hw;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      lightmap 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render lightmap..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (lightmap)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with lightmap renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_lightmap;
+    } else {
+        menuItem    -label "Render lightmap..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (lightmap)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with lightmap renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_lightmap;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      mi 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render mi..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (mi)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with mi renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_mi;
+    } else {
+        menuItem    -label "Render mi..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (mi)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with mi renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_mi;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      mr 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render mr..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (mr)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with mr renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_mr;
+    } else {
+        menuItem    -label "Render mr..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (mr)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with mr renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_mr;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      rib 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render rib..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (rib)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with rib renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_rib;
+    } else {
+        menuItem    -label "Render rib..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (rib)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with rib renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_rib;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      rman 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render rman..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (rman)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with rman renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_rman;
+    } else {
+        menuItem    -label "Render rman..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (rman)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with rman renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_rman;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      sw 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render sw..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (sw)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with sw renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_sw;
+    } else {
+        menuItem    -label "Render sw..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (sw)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with sw renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_sw;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      turtle 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render turtle..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (turtle)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with turtle renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_turtle;
+    } else {
+        menuItem    -label "Render turtle..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (turtle)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with turtle renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_turtle;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      vr 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render vr..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (vr)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with vr renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_vr;
+    } else {
+        menuItem    -label "Render vr..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (vr)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with vr renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_vr;
+    }
+    // --------------------------------------------------------------------------------
+    
+    // --------------------------------------------------------------------------------
+    //      vray 
+    // --------------------------------------------------------------------------------
+    if (getApplicationVersionAsFloat() >= 2009) { // contains renderpass added in Maya 2009
+        menuItem    -label "Render vray..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (vray)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"','renderPass_all':'\"+stringArrayToString(`ls -type renderPass`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with vray renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_vray;
+    } else {
+        menuItem    -label "Render vray..."
+                -c `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate (" --submitDict \\\"{'name':'maya batchrender \"+`file -q -sn -shn`+\"', 'prototype':'appFinder', 'package':{'simpleCmdType':'Maya (AppFinder) BatchRender (vray)', 'scenefile':'\"+`file -q -sn`+\"', '-proj':'\"+`workspace -q -rd`+\"', 'range':'\"+`playbackOptions -q -min`+\"-\"+`playbackOptions -q -max`+\"','camera_all':'\"+stringArrayToString(`listCameras -p -o`, \" \")+\"', 'renderLayer_all':'\"+stringArrayToString(`ls -type renderLayer`, \" \")+\"', 'appName':'mayaBatch', 'appToken':'__MAYA__', 'appVersion':(\" + `getApplicationVersionAsFloat` + \",)}}\\\"")`
+                -annotation "Render current scene with vray renderer through Qube using the appropriate Mayabatch AppFinder that exposes all commandline render options"
+                -echoCommand true
+                 qube_submitAppFinderRender_vray;
+    }
+    // --------------------------------------------------------------------------------
+    
+    setParent -menu ..;
+}

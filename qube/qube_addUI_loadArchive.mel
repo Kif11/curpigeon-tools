@@ -1,0 +1,57 @@
+// -----------------------------
+//  $Revision: #1 $
+//  $Change: 12648 $
+// -----------------------------
+
+//
+// Add Maya menu items for Qube "Maya (AppFinder) Batch Render" jobs, which use Qube's "appFinder" jobtype.
+// This jobtype differs from the cmdrange "batch render" jobtype in that the submitting user does
+// not have to know the path to the maya executable on the worker, which also allows the appFinder
+// jobs to run on workers with a mixed set of OS's.
+//
+// PipelineFX
+//
+
+// The global proc defined here is called by qube_addUI_menuCore, which in turn is called from
+// userSetup.mel at Maya startup.
+//
+
+// Location of userSetup.mel:
+//	  * Windows: (Users Documents Directory)\maya\<Version>\scripts
+//	  * Mac OS X: ~/Library/Preferences/Autodesk/maya/<version>/scripts.
+//	  * Linux: ~/maya/<version>/scripts.
+//
+
+
+global proc qube_loadJobArchive()
+{
+    global string $gQube_cmdTemplate;
+
+    string $jobArchive = `fileDialog -mode 0 -directoryMask "*.xja;*.qja" -title "Browse for Qube Job Archive (*.qja, *.xja)"`;
+    
+    if ($jobArchive != "")
+    {
+        string $submitCmd = `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate ("--submitFile " + $jobArchive)`;
+        eval $submitCmd;
+    }
+    else
+    {
+        print "No Qube job archive selected, submission cancelled.\n";
+    }
+}
+
+//
+// qube_addUI_loadArchive()
+//
+global proc qube_addUI_loadArchive()
+{
+    global string $gQubeMenu;
+
+    setParent -menu $gQubeMenu;
+
+    menuItem -label "Load Job From Qube Archive File..."
+        -command ("qube_loadJobArchive()")
+        -annotation "Submit a job from an existing Qube job archive file (*.qja, *.xja)"
+        -echoCommand true
+        qube_submitJobFromFile;
+}

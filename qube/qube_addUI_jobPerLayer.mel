@@ -1,0 +1,140 @@
+// -----------------------------
+//  $Revision: #1 $
+//  $Change: 11246 $
+// -----------------------------
+
+//
+// Add Maya menu items for to submit a "maya" render job per renderLayer, using
+// the "dynamic allocation" jobtype.
+//
+// PipelineFX
+//
+
+// The global proc defined here is called by qube_addUI_menuCore, which in turn is called from
+// userSetup.mel at Maya startup.
+//
+
+// Location of userSetup.mel:
+//          * Windows: (Users Documents Directory)\maya\<Version>\scripts
+//          * Mac OS X: ~/Library/Preferences/Autodesk/maya/<version>/scripts.
+//          * Linux: ~/maya/<version>/scripts.
+//
+
+proc string[] getRenderableCameras(string $layer)
+{
+	string $renderables[];
+	string $currlayer = `editRenderLayerGlobals -q -currentRenderLayer`;
+	editRenderLayerGlobals -currentRenderLayer $layer;
+	string $cams[] = `ls -cameras`;
+
+	for($c in $cams) {
+		if(getAttr($c + ".renderable") == 1) {
+			$renderables[size($renderables)] = $c;
+		}
+	}
+	// restore old current layer
+	editRenderLayerGlobals -currentRenderLayer $currlayer;
+	return $renderables;
+}
+
+
+global proc qube_submit_job_per_layer()
+{
+	global string $gQube_cmdTemplate;
+
+	// grab a list of renderable layers
+	string $renderableLayers[];
+	string $l;
+	for ($l in `ls -type renderLayer`) {
+		string $reference = `match "^.*:" $l`;
+		// skip render layers that belong to referenced files
+		if($reference != "") {
+			print ("INFO: Skipping render layer from referenced file[" +
+				   $l + "]");
+		} else if(getAttr($l + ".renderable") == 1) {
+			$renderableLayers[size($renderableLayers)] = $l;
+		}
+	}
+
+	// warn and return if there aren't any renderable layers
+	if(size($renderableLayers) == 0) {
+		warning "No renderable layers";
+		return;
+	}
+	
+	// save currently active render layer so we may restore later
+	string $saveCurrentLayer = `editRenderLayerGlobals -q -currentRenderLayer`;
+
+	// make sure that the Render Settings window is open-- otherwise, the
+	// editRenderLayerGlobals command generates errors
+	unifiedRenderGlobalsWindow;
+
+	// loop over all renderable layers, and open a qube submit dialog
+        string $qubegui_args = "";
+        int $nLayers = `size $renderableLayers`;
+        int $i;
+	for ($i=0; $i < $nLayers; $i++) {
+
+                string $l = $renderableLayers[$i];
+
+		// set the current render layer to default, get start,end,step
+		editRenderLayerGlobals -currentRenderLayer defaultRenderLayer;
+		$s = `getAttr defaultRenderGlobals.startFrame`;
+		$e = `getAttr defaultRenderGlobals.endFrame`;
+		$b = `getAttr defaultRenderGlobals.byFrameStep`;
+
+		// set to the current render layer, and override start,end,step
+		editRenderLayerGlobals -currentRenderLayer $l;
+		$s = `getAttr defaultRenderGlobals.startFrame`;
+		$e = `getAttr defaultRenderGlobals.endFrame`;
+		$b = `getAttr defaultRenderGlobals.byFrameStep`;
+
+
+		// set the renderable cameras for this layer
+		string $renderableCameras[] = getRenderableCameras($l);
+		string $cameras = stringArrayToString($renderableCameras, " ");
+
+		$qubegui_args = ( $qubegui_args + 
+			" --submitDict \\\"{'name':'maya layer render [\"+" +
+			"`file -q -sn -shn`+\":" + $l +
+			"]', 'prototype':'maya', 'package':{" +
+			"'scenefile':'\"+`file -q -sn`+\"', " +
+			"'project':'\"+`workspace -q -rd`+\"', " +
+			"'range':'" + $s + "-" + $e + "x" + $b +
+			"', " +
+			"'layers':'" + $l + "', " +
+			"'cameras_all':'\"+stringArrayToString" +
+			"(`listCameras -p -o`, \" \")+\"', " +
+			"'cameras':'" + $cameras + "', " +
+			"'renderers_all':'\"+stringArrayToString" +
+			"(`renderer -q -ava`, \" \")+\"', " +
+			"'layers_all':'\"+stringArrayToString" +
+			"(`ls -type renderLayer`, \" \")+\"'}}\\\"");
+
+	}
+
+        // run the qubegui dlg
+        string $evalCmd = `substitute "QUBEGUI_ARGS" $gQube_cmdTemplate ($qubegui_args)`;
+        evalEcho($evalCmd);
+
+	// restore the current layer
+	editRenderLayerGlobals -currentRenderLayer $saveCurrentLayer;
+}
+
+//
+// qube_addUI_jobPerLayer()
+//
+global proc qube_addUI_jobPerLayer()
+{
+	global string $gQubeMenu;
+		
+	// Add menuitems
+	print ("Adding Qube menuitems to Qube! menu\n");
+	setParent -menu $gQubeMenu;
+
+	menuItem -label "Submit Maya Render Job per Layer..."
+		-c "qube_submit_job_per_layer()"
+		-annotation ("Submit each renderable layer to render in a separate Qube! job")
+		-echoCommand true
+		qube_submitJobPerLayer;
+}
