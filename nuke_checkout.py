@@ -21,8 +21,5 @@ while invalid:
 
 
 # End of the program
-raw_input('Press any key to finish.')
-
-g:
-        
+raw_input('Press any key to finish.')   
         

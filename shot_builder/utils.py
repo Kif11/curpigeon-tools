@@ -136,8 +136,6 @@ def set_layer_attr(node_type, attr_name, attr_value, layer):
 		cmds.editRenderLayerAdjustment(node + '.' + attr_name, layer=layer)
 		cmds.setAttr(node + '.' + attr_name, attr_value)
 
-
-
 # Debug
 # file_name = '//netapp/collab/tbertino_Curpigeon_/Curpigeon_Project/Scenes/SQ05/SH16/maya/SQ05_SH16_02_KIR.ma'
 # print extract_context(file_name)

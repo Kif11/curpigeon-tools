@@ -2,6 +2,8 @@ import maya.cmds as cmds
 import maya.mel
 import os.path
 import utils
+import re
+import shutil
 
 # Reload for debug purposes
 reload(utils)
@@ -95,8 +97,10 @@ class App(object):
 		cmds.button(label='GEO', w=60, h=40, command=self.import_geo)
 		cmds.button(label='ABC', w=60, command=self.import_abc)
 
-		cmds.button(label='MAKE LAYERS', w=100, command=self.configure_layers)
-		cmds.button(label='SET RENDER', w=100, command=self.configure_render)
+		cmds.button(label='LAYERS', w=100, command=self.configure_layers)
+		cmds.button(label='VRAY SETTINGS', w=100, command=self.configure_render)
+		cmds.button(label='OPEN FOR EDIT', w=100, command=self.open_for_edit)
+		
 		
 		cmds.showWindow(flWin)
 
@@ -293,6 +297,82 @@ class App(object):
 					cmds.editRenderLayerMembers('FG', objects)
 
 
+	def open_for_edit(self, *args):
+
+		for char, value in self.char_values().items():
+			if value:
+
+				char_path = self.geo_paths()[char]
+
+				self.backup_asset(char_path)
+
+				# Open selected maya asset file
+				cmds.file(self.geo_paths()[char], open=True, force=True)
+
+	def backup_asset(self, asset_path):
+
+		char_root, char_file_name = os.path.split(asset_path)
+		name, ext = os.path.splitext(char_file_name)
+		wip_path = '%s/wip' % char_root
+
+		if not os.path.exists(wip_path):
+			os.mkdir(wip_path)
+
+		wip_files = os.listdir(wip_path)
+
+		# If files in directory
+		if len(wip_files) == 0:
+			version = 1
+		# If there are files find the last version
+		else:
+			version_list = []
+			for f in wip_files:
+				search = re.search(r'\d+', f)
+				if search:
+					version_list.append(int(search.group()))
+			version = sorted(version_list)[-1:][0] + 1
+
+		print name, 'version', version, 'created in', wip_path
+
+		new_name = '%s_%02d%s' % (name, version, ext)
+		new_version_path = '%s/%s' % (wip_path, new_name)
+		shutil.copy(asset_path, new_version_path)
+
+
+	def clean_up_scene ():
+
+		delete_names = ['ikSystem', 'Turtle', 'xgen', 'xgm']
+		delete_types = ['mentalray', 'container']
+
+		delete_list = []
+		all_nodes = cmds.ls()
+
+		# Append all the nodes that specified in deletion_names
+		for node in all_nodes:
+			for node_name in delete_names:
+				if node.startswith(node_name):
+					delete_list.append(node)
+
+			for node_type in delete_types:
+				if cmds.nodeType(node).startswith(node_type):
+					delete_list.append(node)
+
+		for node in delete_list:
+			print node
+		do_delete = raw_input("Delete?")
+
+		if do_delete:
+			# Delete node tha in delete_list
+			for node in delete_list:
+				try:
+					cmds.lockNode(node, lock=False)
+					cmds.delete(node)
+					print node, 'Deleted'
+				except:
+					print node, 'Can not be deleted'
+					pass
+
+
 	def configure_layers(self, *args):
 
 		mate_shaders = self.cwd + '/Scripts/shot_builder/lib/shadow_layer_mtl.ma'
@@ -385,44 +465,62 @@ class App(object):
 		sequence = self.context()['sequence']
 		shot = self.context()['shot']
 
-		vr_setings_node = 'vraySettings'
+		start_frame = cmds.playbackOptions(q=True, minTime=True)
+		end_frame = cmds.playbackOptions(q=True, maxTime=True)
 
-		''' This is crush maya on save
-
-		# Delete vray settings node if alredy exist
-		if cmds.objExists(vr_setings_node):
-			cmds.delete(vr_setings_node)
-
-		vr_settings_file = '%s/lib/vray_settings.ma' % self.app_dir
-
-		# Import a new vray settings node
-		cmds.file(vr_settings_file, i=True)
-		'''
-
-		# Set render output path
 		render_output = 'SQ%02d/SH%02d/maya/%%s/<Layer>/%%s' % (sequence, shot)
+
+		## Setting vray settings
+
+		vr_setings_node = 'vraySettings'
+		deffailt_settings_node = 'defaultRenderGlobals'
+		
+		# Render output path
 		cmds.setAttr(vr_setings_node + '.fileNamePrefix', render_output, type='string')
 
-		# preset_path = self.cwd + '/Scripts/shot_builder/lib/vray_settings.mel'
+		# Output format
+		cmds.setAttr(vr_setings_node + '.imageFormatStr', 'exr (multichannel)', type='string')
 
-		# cmds.nodePreset(load=True)
+		# Animation
+		cmds.setAttr(deffailt_settings_node + '.animation', True)
+		cmds.setAttr(vr_setings_node + '.animBatchOnly', True)
 
-		# http://mayafail.blogspot.com/2010/02/mayapresetpath-is-abortion-of-shame.html
+		# Frame range
+		cmds.setAttr(deffailt_settings_node + '.startFrame', start_frame)
+		cmds.setAttr(deffailt_settings_node + '.endFrame', end_frame)
 
-		# vr_settings_node = 'vraySettings'
-		# settings = {'width': 1920,
-		# 			'height':1080,
-		# 			'relements_usereferenced': 1,
-		# 			'ddisplac_maxSubdivs': 3
-		# 			'giOn': 0
-		# 			'dmcMaxSubdivs': 8
-		# 			'cam_mbOn': 1
-		# 			'imageFormatStr': 6
-		# 			'ddisplac_maxSubdivs':
-		# 			}
+		# Resolution
+		cmds.setAttr(vr_setings_node + ".width", 1920)
+		cmds.setAttr(vr_setings_node + ".height", 1080)
 
-		# for field, value in settings.items():
-		# 	cmds.setAttr(vr_settings_node + '.' + field, value)
+		# Global
+		cmds.setAttr(vr_setings_node + '.globopt_mtl_limitDepth', True)
+		cmds.setAttr(vr_setings_node + '.globopt_mtl_maxDepth', 3)
+		cmds.setAttr(vr_setings_node + '.globopt_render_viewport_subdivision', True)
+
+		# DMC Sampler
+		cmds.setAttr(vr_setings_node + '.dmcThreshold', 0.01)
+		cmds.setAttr(vr_setings_node + '.dmcMaxSubdivs', 6)
+
+		# Camera
+		cmds.setAttr(vr_setings_node + '.cam_mbOn', True)
+
+		# VRay UI
+		cmds.setAttr(vr_setings_node + '.ui_render_swatches', False)
+
+		# GI
+		cmds.setAttr(vr_setings_node + '.giOn', True)
+		cmds.setAttr(vr_setings_node + '.primaryEngine', 2)
+		cmds.setAttr(vr_setings_node + '.dmc_depth', 1)
+
+
+		cmds.setAttr(vr_setings_node + '.sys_regsgen_xc', 64)
+		cmds.setAttr(vr_setings_node + '.sys_rayc_dynMemLimit', 24000)
+		cmds.setAttr(vr_setings_node + '.ddisplac_maxSubdivs', 3)
+
+		# Render elements
+		cmds.setAttr(vr_setings_node + '.relements_usereferenced', True)
+
 
 	def enable_element(self, layer, args):
 
