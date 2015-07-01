@@ -4,9 +4,11 @@ import os.path
 import utils
 import re
 import shutil
+import context
 
 # Reload for debug purposes
 reload(utils)
+reload(context)
 
 class App(object):
 
@@ -18,51 +20,54 @@ class App(object):
 			'Pigeons': ['Rocky', 'Raggedy', 'Scrawny', 'Longbeak', 'Heavy', 'Boxy']
 			 }
 
+		# Path to current scene file
 		scene_path = cmds.file(q=True, sceneName=True)
-		self.sequence, self.shot = utils.extract_context(scene_path)
+		
+		my_context = context.Context()
 
-		# Try to retrive the current sequence and shot from the filename
-		scene_path = cmds.file(q=True, sceneName=True)
+		if scene_path:
 
-		# Populate sequence and shot field base on file name
-		self.sequence, self.shot = utils.extract_context(scene_path)
+			my_context.scene_path = scene_path
+		
+			self.sequence = my_context.get['sequence']
+			self.shot = my_context.get['shot']
 
-		# If utils.extract_context failed set fields empty
-		if self.sequence <= 0:
-			self.sequence, self.shot = '', ''
+		else:
 
-		# Project path
+			self.sequence = '' 
+			self.shot = ''
+
+		# Run directory
 		self.cwd = os.getcwd().replace('\\', '/')
-		# self.project_path = self.cwd.replace('\\', '/')
-		self.project_path = cmds.workspace(q=True, rootDirectory=True)
+
+		# Script directory
 		self.app_dir = os.path.dirname(os.path.realpath(__file__)).replace("\\","/")
 
-		self.envStr = 'Assets/Env/Master/env.ma'
+		# Project directory
+		self.project_path = cmds.workspace(q=True, rootDirectory=True)
 
-		self.lightStr = 'Assets/Env/Light/light.ma'
 
 		# Initilize UI
 		self.ui()
 
+		
+
 
 	def ui(self):
 
-		#ESTABLISHES THE UI
-		flWin = cmds.window(title="Curpigeon Scene Setup", wh=(378,156), maximizeButton=False, minimizeButton=False, resizeToFitChildren=True)
+		# ESTABLISHES THE UI
+		flWin = cmds.window(title="Curpigeon Scene Setup", wh=(378,156), maximizeButton=True, minimizeButton=False, resizeToFitChildren=True)
 		cmds.columnLayout(adjustableColumn = True)
 
-		#Characters Imports
+		# Characters Imports
 
-		cmds.text(label='')
 		cmds.text(label='Project Path' , align = 'left')
-		projectPath = cmds.textField(w=100, tx= self.project_path, editable= False) #Creates the projectPath Variable
+		project_path = cmds.textField(w=100, tx= self.project_path, editable= False) #Creates the projectPath Variable
 
 		cmds.rowColumnLayout( numberOfColumns=6 )
 
-		cmds.text(label='')
-		cmds.text(label='')
 
-		#cmds.rowColumnLayout( numberOfRows=1 )
+		# cmds.rowColumnLayout( numberOfRows=1 )
 
 		cmds.text( label='SQ', align='right')
 		self.stringSQ = cmds.textField(w=20, tx=self.sequence)
@@ -70,22 +75,12 @@ class App(object):
 		cmds.text( label='SH', align='right' )
 		self.stringSH = cmds.textField(w=20, tx=self.shot)
 
-		cmds.text(label='')
-		cmds.text(label='')
-		cmds.text(label='')
-		cmds.text(label='')
-		cmds.text(label='')
-		cmds.text(label='')
 
 		self.char_checkboxes = {}
 		for kind in self.characters:
 			for char in self.characters[kind]:
 				self.char_checkboxes[char] = cmds.checkBox(label=char, value=False)
 
-		cmds.text(label='')
-		cmds.text(label='')
-		cmds.text(label='')
-		cmds.text(label='')
 
 		cmds.button(label='FRANGE', w=40, command=self.set_frame_range)
 		cmds.button(label='GOTO SG', w=40, command=self.goto_sg)
@@ -104,24 +99,24 @@ class App(object):
 		
 		cmds.showWindow(flWin)
 
-	# Return curent sequnce and shot number specified in corespondin fields
-	def context(self):
+	# # Return curent sequnce and shot number specified in corespondin fields
+	# def context(self):
 
-		sequence = cmds.textField(self.stringSQ, q=True, text=True )
-		shot = cmds.textField(self.stringSH, q=True, text=True )
+	# 	sequence = cmds.textField(self.stringSQ, q=True, text=True )
+	# 	shot = cmds.textField(self.stringSH, q=True, text=True )
 
 
-		if shot == '' or sequence == '':
-			print 'Specify your shot and sequence first'
+	# 	if shot == '' or sequence == '':
+	# 		print 'Specify your shot and sequence first'
 
-			# TODO:(kirill) Need to breake here somehow???
-			return 0
+	# 		# TODO:(kirill) Need to breake here somehow???
+	# 		return 0
 
-		shot_code = 'SQ' + sequence + '_' + 'SH' + shot
+	# 	shot_code = 'SQ' + sequence + '_' + 'SH' + shot
 
-		return {'sequence': int(sequence),
-				'shot': int(shot), 
-				'shot_code': shot_code}
+	# 	return {'sequence': int(sequence),
+	# 			'shot': int(shot), 
+	# 			'shot_code': shot_code}
 
 	# Return dictionary of char name : path to character geo file
 	def geo_paths(self):
