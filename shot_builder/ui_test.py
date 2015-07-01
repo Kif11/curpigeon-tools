@@ -37,6 +37,7 @@ class MainDialog(QDialog, showUI.Ui_SB_Form):
 
 	def create_new_scene(self):
 		print 'Creating new maya scene', self.context()
+		
 
 
 app = QApplication(sys.argv)
