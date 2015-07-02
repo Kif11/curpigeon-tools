@@ -5,7 +5,7 @@ import shot_builder.app as sb
 import shot_builder.utils as sbutils
 import kk_tools.app as kk
 
-reload(sb)
+# reload(sb)
 
 # Create custome main menu
 def create_menu():
@@ -15,7 +15,7 @@ def create_menu():
 
 	# Populate menu with elements
 
-	cmds.menuItem(parent=oMenu, label='Shot Builder', command='sb.App()')
+	cmds.menuItem(parent=oMenu, label='Shot Builder', command='sb.main()')
 
 	cmds.menuItem(parent=oMenu, label='TOOLS', divider=True)
 

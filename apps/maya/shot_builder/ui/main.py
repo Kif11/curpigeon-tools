@@ -8,6 +8,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PySide import QtCore, QtGui
+import os
 
 class Ui_SB_Form(object):
     def setupUi(self, SB_Form):
@@ -15,8 +16,6 @@ class Ui_SB_Form(object):
         SB_Form.setEnabled(True)
         SB_Form.resize(439, 286)
         SB_Form.setMaximumSize(QtCore.QSize(800, 600))
-        SB_Form.setStyleSheet("background-color: rgb(25, 25, 25);\n"
-"color: rgb(241, 241, 241);")
         self.gridLayout = QtGui.QGridLayout(SB_Form)
         self.gridLayout.setObjectName("gridLayout")
         self.importLayout = QtGui.QGridLayout()
@@ -73,7 +72,7 @@ class Ui_SB_Form(object):
         self.newSceneBTN = QtGui.QPushButton(self.sceneGRP)
         self.newSceneBTN.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("new_scene.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon.addPixmap(QtGui.QPixmap(os.path.join(os.path.dirname(__file__), 'new_scene.png')), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.newSceneBTN.setIcon(icon)
         self.newSceneBTN.setObjectName("newSceneBTN")
         self.gridLayout_6.addWidget(self.newSceneBTN, 0, 2, 1, 1)
