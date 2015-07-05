@@ -94,7 +94,7 @@ class Maya(Application):
 
 				break
 
-	# Test git plus
+	# Git-plus is suck but git controll is awesome!!!
 
 
 if __name__ == '__main__':
