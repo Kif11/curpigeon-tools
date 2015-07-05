@@ -1,6 +1,6 @@
 # from engines import maya
 # import sys
-# import os
+
 
 # cwd = os.getcwd()
 # sys.path.append(cwd)
@@ -11,6 +11,7 @@
 
 # maya.run()
 
+import os
 import subprocess
 
 
@@ -23,8 +24,9 @@ class Environment(object):
 	def set_env (self):
 
 		for key, value in self.vars.items():
+			os.environ[key] = value
 			print 'Setting', key, 'to', value
-		
+
 
 
 class Application(Environment):
@@ -36,16 +38,19 @@ class Application(Environment):
 
 	def start(self):
 
-		# subprocess.Popen(cmd)
+		subprocess.Popen(self.exe)
 		print "Executing", self.exe
 
 
 class Maya(Application):
 
-	def __init__(self, project=None):
+	def __init__(self, project=None, script=None, user_pref=None):
 
 		self.name = 'Maya'
+
 		self._project = project
+		self._script = script
+		self._user_prefs = user_pref
 
 	@property
 	def project(self):
@@ -54,18 +59,51 @@ class Maya(Application):
 	@project.setter
 	def project(self, value):
 
-		self.env(PROJECT="D:/MayaProject")
-		self.set_env()
-
 		self._project = value
 
+		self.env(MAYA_PROJECT=self._project)
+		self.set_env()
 
-maya = Maya()
+	@property
+	def script(self):
+	    return self._script
 
-maya.env(APPDIR='F:/SomeDir', FRAMEBUFFER=1)
-maya.set_env()
+	@script.setter
+	def script (self, value):
 
-maya.exe = 'C:/Maya.exe'
-maya.project = 'D:/MyProject'
+		self._script = value
 
-maya.start()
+		self.env(PYTHONPATH=self._script,
+				 MAYA_SCRIPT_PATH=self._script)
+		self.set_env()
+
+	@property
+	def user_prefs(self):
+	    return self._user_prefs
+
+	@user_prefs.setter
+	def user_prefs(self, paths):
+
+		for path in paths:
+			# Check if directory is exist use it
+			if os.path.exists(path):
+				self.env(MAYA_APP_DIR=path)
+				self.set_env()
+
+				self._user_prefs = path
+
+				break
+
+	# Test git plus
+
+
+if __name__ == '__main__':
+
+	maya = Maya()
+
+	maya.exe = '/Applications/Autodesk/maya2015/Maya.app/Contents/bin/maya'
+	maya.project = '/Users/admin/Desktop/maya_test_project'
+	maya.script = '/test/scrip/directory'
+	maya.user_prefs = ['/Users/admin/Desktop/maya']
+
+	maya.start()
