@@ -1,0 +1,5 @@
+import shot_builder.app as sb
+
+reload(sb)
+
+sb.App()

@@ -18,7 +18,8 @@ maya_user_prefs = ['H:/Code/Python/kk-maya-launcher/config/user_prefs/maya',
 				   'F:/Code/Python/kk-maya-launcher/config/user_prefs/maya',
 				   'G:/Code/Python/kk-maya-launcher/config/user_prefs/maya',
 				   'J:/Code/Python/kk-maya-launcher/config/user_prefs/maya',
-				   'G:/maya']
+				   'G:/maya',
+				   '//180net1/Collab/tbertino_Curpigeon/Curpigeon_Project/Scripts/prefs/maya']
 
 # Set up environmental variables
 os.environ['MAYA_PROJECT'] = cwd
@@ -29,8 +30,16 @@ os.environ['MAYA_SCRIPT_PATH'] = os.pathsep.join([scripts_dir, qube_dir])
 for path in maya_user_prefs:
 	# Check if directory is exist use it
 	if os.path.exists(path):
-		print "User pref", path
+		print "User preferences", path
 		os.environ['MAYA_APP_DIR'] = path
+		break
+
+
+# Print environment for debug
+print 'Project:', os.environ['MAYA_PROJECT']
+print 'User prefs:', os.environ['MAYA_APP_DIR']
+print 'Python scripts:', os.environ['PYTHONPATH']
+print 'Mel scripts:', os.environ['MAYA_SCRIPT_PATH']
 
 # Run application
 subprocess.Popen(maya_exec)

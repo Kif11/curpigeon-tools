@@ -1,0 +1,10 @@
+import shot_builder.utils as utils
+import maya.cmds as cmds
+
+ref_name = cmds.referenceQuery('GEO_ErnestRN', filename=True)
+
+print ref_name
+
+cmds.file(ref_name,unloadReference=True)
+cmds.referenceEdit(ref_name, removeEdits=True)
+cmds.file(ref_name,loadReference=True)

@@ -13,32 +13,35 @@ class App(object):
 
 	def __init__(self):
 
+		# Initialize character type:name dictionary
 		self.characters = {
 			'Humans' : ['Tom', 'Vincent', 'Joe', 'Bob', 'George', 'Ernest'], 
 			'Pigeons': ['Rocky', 'Raggedy', 'Scrawny', 'Longbeak', 'Heavy', 'Boxy']
 			 }
 
-		scene_path = cmds.file(q=True, sceneName=True)
-		self.sequence, self.shot = utils.extract_context(scene_path)
-
-		# Try to retrive the current sequence and shot from the filename
+		# Path to current scene file
 		scene_path = cmds.file(q=True, sceneName=True)
 
-		# Populate sequence and shot field base on file name
+		# Try to extract sequence and shot number from maya scene name
 		self.sequence, self.shot = utils.extract_context(scene_path)
 
 		# If utils.extract_context failed set fields empty
 		if self.sequence <= 0:
 			self.sequence, self.shot = '', ''
 
-		# Project path
+		# Directory from which this script run
+		# Can differ from the script location
+		# in case when run from shortcut or command line
 		self.cwd = os.getcwd().replace('\\', '/')
-		# self.project_path = self.cwd.replace('\\', '/')
+
+		# Project root directory
 		self.project_path = cmds.workspace(q=True, rootDirectory=True)
+
+		# Directory of this script
 		self.app_dir = os.path.dirname(os.path.realpath(__file__)).replace("\\","/")
 
+		# Define important file loacation with respect to project root
 		self.envStr = 'Assets/Env/Master/env.ma'
-
 		self.lightStr = 'Assets/Env/Light/light.ma'
 
 		# Initilize UI
@@ -47,11 +50,11 @@ class App(object):
 
 	def ui(self):
 
-		#ESTABLISHES THE UI
+		# Establish UI
 		flWin = cmds.window(title="Curpigeon Scene Setup", wh=(378,156), maximizeButton=False, minimizeButton=False, resizeToFitChildren=True)
 		cmds.columnLayout(adjustableColumn = True)
 
-		#Characters Imports
+		# Characters Imports
 
 		cmds.text(label='')
 		cmds.text(label='Project Path' , align = 'left')
@@ -97,14 +100,30 @@ class App(object):
 		cmds.button(label='GEO', w=60, h=40, command=self.import_geo)
 		cmds.button(label='ABC', w=60, command=self.import_abc)
 
-		cmds.button(label='LAYERS', w=100, command=self.configure_layers)
+		cmds.button(label='CLEANUP', w=100, command=self.clean_up_scene)
 		cmds.button(label='VRAY SETTINGS', w=100, command=self.configure_render)
 		cmds.button(label='OPEN FOR EDIT', w=100, command=self.open_for_edit)
 		
 		
 		cmds.showWindow(flWin)
 
-	# Return curent sequnce and shot number specified in corespondin fields
+	# Return sequnce and shot number specified in corespondin fields of ui
+
+	# class context():
+	# 	def update(self):
+	# 		self.sequence = cmds.textField(self.stringSQ, q=True, text=True )
+	# 		self.shot = cmds.textField(self.stringSH, q=True, text=True )
+	# 	def getData(self):
+	# 		self.update()
+			
+	# 		if self.shot == '' or self.sequence == '':
+	# 			raise ( "nodata Error")
+	# 			return False
+	# 		else:
+	# 			return {'sequence': int(sequence),
+	# 			'shot': int(shot), 
+	# 			'shot_code': shot_code}
+
 	def context(self):
 
 		sequence = cmds.textField(self.stringSQ, q=True, text=True )
@@ -260,16 +279,16 @@ class App(object):
 		# Reference the environment file
 		objects = utils.reference(env_path)
 		
-		if objects:
+		# if objects:
 			# Assign tag
-			utils.set_tag(objects, 'env')
+			# utils.set_tag(objects, 'env')
 
 			# Create render layers
 			# utils.create_render_layers()
 
 			# Create render layer and assign imported objects to it
-			utils.create_render_layers(['BG'])
-			cmds.editRenderLayerMembers('BG', objects)
+			# utils.create_render_layers(['BG'])
+			# cmds.editRenderLayerMembers('BG', objects)
 
 
 	def import_abc (self, *args):
@@ -277,6 +296,7 @@ class App(object):
 		for char, value in self.char_values().items():
 			if value:
 				maya.mel.eval('AbcImport -mode import -connect "/"' + '"' + self.cache_paths(self.context()['sequence'], self.context()['shot'])[char] + '";')
+
 
 
 	def import_geo(self, *args):
@@ -288,13 +308,13 @@ class App(object):
 			if value:
 				objects = utils.reference(self.geo_paths()[char])
 
-				# Assign tag
-				if objects:
-					utils.set_tag(objects, 'char')
+				# # Assign tag
+				# if objects:
+				# 	utils.set_tag(objects, 'char')
 
 					# Create render layer and assign imported objects to it
-					utils.create_render_layers(['FG'])
-					cmds.editRenderLayerMembers('FG', objects)
+					# utils.create_render_layers(['FG'])
+					# cmds.editRenderLayerMembers('FG', objects)
 
 
 	def open_for_edit(self, *args):
@@ -339,7 +359,7 @@ class App(object):
 		shutil.copy(asset_path, new_version_path)
 
 
-	def clean_up_scene ():
+	def clean_up_scene (self, *args):
 
 		delete_names = ['ikSystem', 'Turtle', 'xgen', 'xgm']
 		delete_types = ['mentalray', 'container']
@@ -359,9 +379,9 @@ class App(object):
 
 		for node in delete_list:
 			print node
-		do_delete = raw_input("Delete?")
+		do_delete = cmds.confirmDialog( title='Confirm Deletion', message='Do you want to delete nodes listed in the console?', button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No' )
 
-		if do_delete:
+		if do_delete == 'Yes':
 			# Delete node tha in delete_list
 			for node in delete_list:
 				try:
@@ -371,8 +391,11 @@ class App(object):
 				except:
 					print node, 'Can not be deleted'
 					pass
+		else:
+			print 'Operation canceled.'
 
 
+	# Depricated
 	def configure_layers(self, *args):
 
 		mate_shaders = self.cwd + '/Scripts/shot_builder/lib/shadow_layer_mtl.ma'
@@ -470,6 +493,21 @@ class App(object):
 
 		render_output = 'SQ%02d/SH%02d/maya/%%s/<Layer>/%%s' % (sequence, shot)
 
+
+		# Set all non defailt camera to renderable
+		cams = cmds.ls(type='camera')
+		default_cams = [u'frontShape', u'perspShape', u'topShape', u'sideShape']
+
+		for cam in cams:
+			if cam in default_cams:
+				cmds.setAttr(cam + '.renderable', False)
+			else:
+				cmds.setAttr(cam + '.renderable', True)
+				print cam
+
+		# main_cam_shape = [cam for cam in cams if cam not in [u'frontShape', u'perspShape', u'topShape', u'sideShape']][0]
+
+
 		## Setting vray settings
 
 		vr_setings_node = 'vraySettings'
@@ -493,14 +531,17 @@ class App(object):
 		cmds.setAttr(vr_setings_node + ".width", 1920)
 		cmds.setAttr(vr_setings_node + ".height", 1080)
 
-		# Global
+		# Global options
+		cmds.setAttr(vr_setings_node + '.globopt_geom_displacement', 0) # disable displacement, Can be enabled on a per-shot basis.
 		cmds.setAttr(vr_setings_node + '.globopt_mtl_limitDepth', True)
-		cmds.setAttr(vr_setings_node + '.globopt_mtl_maxDepth', 3)
+		cmds.setAttr(vr_setings_node + '.globopt_mtl_maxDepth', 2) # make sure you adjust this setting on the scenes with reflective/refractive hero objects.
 		cmds.setAttr(vr_setings_node + '.globopt_render_viewport_subdivision', True)
+		cmds.setAttr(vr_setings_node + '.globopt_mtl_transpMaxLevels', 10)
 
 		# DMC Sampler
-		cmds.setAttr(vr_setings_node + '.dmcThreshold', 0.01)
-		cmds.setAttr(vr_setings_node + '.dmcMaxSubdivs', 6)
+		cmds.setAttr(vr_setings_node + '.dmcThreshold', 0.0075)
+		cmds.setAttr(vr_setings_node + '.dmcMaxSubdivs', 8)
+		cmds.setAttr(vr_setings_node + '.dmcs_adaptiveMinSamples', 4)
 
 		# Camera
 		cmds.setAttr(vr_setings_node + '.cam_mbOn', True)
@@ -509,10 +550,10 @@ class App(object):
 		cmds.setAttr(vr_setings_node + '.ui_render_swatches', False)
 
 		# GI
+		cmds.setAttr(vr_setings_node + '.refractiveCaustics', True)
 		cmds.setAttr(vr_setings_node + '.giOn', True)
 		cmds.setAttr(vr_setings_node + '.primaryEngine', 2)
 		cmds.setAttr(vr_setings_node + '.dmc_depth', 1)
-
 
 		cmds.setAttr(vr_setings_node + '.sys_regsgen_xc', 64)
 		cmds.setAttr(vr_setings_node + '.sys_rayc_dynMemLimit', 24000)
@@ -520,6 +561,9 @@ class App(object):
 
 		# Render elements
 		cmds.setAttr(vr_setings_node + '.relements_usereferenced', True)
+		
+		# System - Advanced
+		cmds.setAttr(vr_setings_node + '.sys_rayc_faceLevelCoef', 2)
 
 
 	def enable_element(self, layer, args):

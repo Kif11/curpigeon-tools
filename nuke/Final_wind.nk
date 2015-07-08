@@ -1,0 +1,184 @@
+set cut_paste_input [stack 0]
+version 9.0 v6
+push $cut_paste_input
+add_layer {MM_MainTree MM_MainTree.red MM_MainTree.green MM_MainTree.blue}
+add_layer {MM_OakTree MM_OakTree.red MM_OakTree.green MM_OakTree.blue}
+add_layer {MM_Willow MM_Willow.red MM_Willow.green MM_Willow.blue}
+Group {
+ name Wind_Distortion
+ label "Curpigeon Gizmo "
+ selected true
+ xpos -55
+ ypos 206
+ lock_connections true
+ addUserKnob {20 User}
+ addUserKnob {41 first_frame l "frame range" T FrameRange1.first_frame}
+ addUserKnob {41 last_frame l "" -STARTLINE T FrameRange1.last_frame}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {41 MainTree l "Main Tree Leaves" t "select the main tree mm" T Shuffle2.in}
+ addUserKnob {41 maintree_distort l "Wind Amount" t "increase this to add more wind" T IDistort3.uv_scale}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {41 oaktree l "Oak Leaves" t "select the oak tree leaves mm\n" T Shuffle1.in}
+ addUserKnob {41 oaktree_wind l "Wind Amount" t "increase this to add more wind" T IDistort2.uv_scale}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {41 willowleaves l "Willow Leaves" t "Select willow leaves MM\n" T Shuffle4.in}
+ addUserKnob {41 willow_wind l "Wind Amount" t "increase this to add more wind" T IDistort1.uv_scale}
+}
+ Output {
+  inputs 0
+  name Output1
+  xpos 63
+  ypos 581
+ }
+ Input {
+  inputs 0
+  name Tree_image
+  xpos 255
+  ypos 137
+ }
+set N6100f960 [stack 0]
+ Dot {
+  name Dot3
+  xpos 162
+  ypos 140
+ }
+set N5b4ddcc0 [stack 0]
+ Dot {
+  name Dot2
+  xpos 44
+  ypos 140
+ }
+set N61016fc0 [stack 0]
+ Dot {
+  name Dot1
+  xpos -27
+  ypos 140
+ }
+ Shuffle {
+  in MM_Willow
+  green off
+  blue off
+  alpha red
+  name Shuffle4
+  label "Willow Leaves"
+  xpos -61
+  ypos 445
+ }
+push $N61016fc0
+ Shuffle {
+  in MM_OakTree
+  green off
+  blue off
+  alpha red
+  name Shuffle1
+  label "\[knob in]"
+  xpos 10
+  ypos 377
+ }
+push $N5b4ddcc0
+ Shuffle {
+  in MM_MainTree
+  alpha red
+  name Shuffle2
+  label MM_Maintree
+  xpos 128
+  ypos 305
+ }
+push $N6100f960
+ Reformat {
+  name Reformat2
+  xpos 419
+  ypos 137
+ }
+ Dot {
+  name Dot4
+  xpos 453
+  ypos 161
+ }
+set N6100cf50 [stack 0]
+ Noise {
+  output {rgba.red -rgba.green -rgba.blue rgba.alpha}
+  size 580
+  zoffset {{curve x103 0 x290 1.9}}
+  center {1024 778}
+  name Trunk_UV
+  tile_color 0xff0000ff
+  xpos 419
+  ypos 207
+ }
+push $N6100cf50
+ Dot {
+  name Dot5
+  xpos 554
+  ypos 161
+ }
+ Noise {
+  output {-rgba.red rgba.green -rgba.blue rgba.alpha}
+  size 17
+  zoffset {{curve x103 0 x290 1.9}}
+  gamma 0.33
+  center {1024 778}
+  name Leaves_UV
+  tile_color 0xff00ff
+  xpos 520
+  ypos 207
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  blue black
+  alpha black
+  name ShuffleCopy1
+  xpos 473
+  ypos 249
+ }
+push $N6100f960
+add_layer {IDistort IDistort.u IDistort.v}
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 IDistort.u
+  from1 rgba.green
+  to1 IDistort.v
+  name Copy1
+  xpos 255
+  ypos 240
+ }
+ IDistort {
+  inputs 1+1
+  uv IDistort
+  name IDistort3
+  xpos 255
+  ypos 306
+ }
+ IDistort {
+  inputs 1+1
+  uv IDistort
+  uv_scale 2.3
+  name IDistort2
+  xpos 255
+  ypos 377
+ }
+ IDistort {
+  inputs 1+1
+  channels rgba
+  uv IDistort
+  uv_scale 9.4
+  name IDistort1
+  xpos 255
+  ypos 449
+ }
+ FrameRange {
+  first_frame 1
+  last_frame 100
+  time ""
+  name FrameRange1
+  xpos 255
+  ypos 473
+ }
+ Output {
+  name Output1
+  xpos 255
+  ypos 511
+ }
+end_group
