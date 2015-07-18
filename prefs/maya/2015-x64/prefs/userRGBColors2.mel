@@ -1,4 +1,4 @@
-displayRGBColor -c background 0.631 0.631 0.631;
+displayRGBColor -c background 0 0 0;
 displayRGBColor -c backgroundTop 0.535 0.617 0.702;
 displayRGBColor -c backgroundBottom 0.052 0.052 0.052;
 displayRGBColor -c template 0.47 0.47 0.47;

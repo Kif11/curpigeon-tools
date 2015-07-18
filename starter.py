@@ -2,25 +2,24 @@ import os
 import sys
 from cleaner.app import *
 from config.curpigeon_template import *
-from maya.app import *
-
-user_input = ''
-
-while user_input != 'q':
-
-	user_input = raw_input("->")
+from maya_engine.app import *
 
 
-	if user_input == 'cleaner':
-		
-		c = Cleaner(cpTemplate)
-		c.project_cleanup()
 
 
-	elif user_input == 'maya':
-		
-		m = Maya(cpTemplate)
-		m.run()
+args = sys.argv
 
-# Debug
-# m = Maya(cpTemplate).run()
+
+if args[1] == 'cleaner':
+	
+	c = Cleaner(cpTemplate)
+	c.project_cleanup()
+
+
+elif args[1] == 'maya':
+	
+	m = Maya(cpTemplate)
+	m.run()
+
+else:
+	print 'Unknown command'

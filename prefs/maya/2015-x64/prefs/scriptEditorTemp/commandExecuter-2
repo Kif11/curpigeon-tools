@@ -1,19 +1,10 @@
 import maya.cmds as cmds
-from 
+import maya.mel as mel
 
 
-characters = {
-			'Humans' : ['Tom', 'Vincent', 'Joe', 'Bob', 'George', 'Ernest'], 
-			'Pigeons': ['Rocky', 'Raggedy', 'Scrawny', 'Longbeak', 'Heavy', 'Boxy']
-			 }
+s = cmds.ls(selection=1)
+c = len(s)
 
-flWin = cmds.window(title="Curpigeon Scene Setup", wh=(378,156), maximizeButton=True, minimizeButton=False, resizeToFitChildren=True)
-
-cmds.gridLayout(autoGrow=True)
-
-char_checkboxes = {}
-for kind in characters:
-	for char in characters[kind]:
-		char_checkboxes[char] = cmds.checkBox(label=char, value=False)
-
-cmds.showWindow(flWin)
+for node in s:
+    mel.eval('vray addAttributesFromGroup "%s" "vray_objectID" 1;' % node)
+    cmds.setAttr(node + '.vrayObjectID', 11)

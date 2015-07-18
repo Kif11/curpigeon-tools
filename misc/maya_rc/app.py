@@ -4,7 +4,7 @@ import shutil
 
 
 # Given list of texture pathes will find the uvtiled one 
-# and replace them wiht expanded versions
+# and replace them with expanded versions
 def expand_uv_tiles(path_list):
 
 	for path in path_list:

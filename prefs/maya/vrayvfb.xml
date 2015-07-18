@@ -1,0 +1,9 @@
+<vrayVFB>
+  <history>
+    <enabled>1</enabled>
+    <path>C:/Users/Curpigeon/Desktop</path>
+    <maxDiskSize>200</maxDiskSize>
+    <maxFiles>100</maxFiles>
+    <historyAutoSave>0</historyAutoSave>
+  </history>
+</vrayVFB>

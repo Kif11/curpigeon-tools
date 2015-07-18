@@ -1,7 +1,6 @@
 //Maya Preference 2015 (Release 1)
 //
 //
-evalDeferred("autoLoadPlugin(\"\", \"vrayformaya\", \"vrayformaya\")");
 evalDeferred("autoLoadPlugin(\"\", \"AbcImport\", \"AbcImport\")");
 evalDeferred("autoLoadPlugin(\"\", \"AbcBullet\", \"AbcBullet\")");
 evalDeferred("autoLoadPlugin(\"\", \"fbxmaya\", \"fbxmaya\")");

@@ -63,7 +63,8 @@ class Cleaner(object):
 									   'tmp', 
 									   'zDepth', 
 									   '.DS_Store',
-									   '.iff'],
+									   '.iff',
+									   'defaultRenderLayer'],
 
 							'Scenes': ['.mb', '.DS'],
 							'Cache': ['bifrost', 'particles', '.DS']
@@ -106,4 +107,5 @@ class Cleaner(object):
 		print 'Project', self.project_path, 'has been cleaned'
 
 if __name__ == '__main__':
+	c = Cleaner()
 	project_cleanup()

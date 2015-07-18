@@ -1,0 +1,194 @@
+#! C:/Program Files/Nuke9.0v5/nuke-9.0.5.dll -nx
+version 9.0 v5
+Gizmo {
+ addUserKnob {20 User}
+ addUserKnob {41 in l "in 1" T mm1.in}
+ addUserKnob {41 in_1 l "in 1" T mm2.in}
+ addUserKnob {41 in_2 l "in 1" T mm3.in}
+ addUserKnob {41 in_3 l "in 1" T mm5.in}
+ addUserKnob {41 in_4 l "in 1" T mm6.in}
+ addUserKnob {41 in_5 l "in 1" T mm7.in}
+ addUserKnob {41 in_6 l "in 1" T mm8.in}
+ addUserKnob {41 in_7 l "in 1" T mm9.in}
+ addUserKnob {41 in_8 l "in 1" T mm10.in}
+ addUserKnob {41 in_9 l "in 1" T mm11.in}
+ addUserKnob {41 in_10 l "in 1" T mm12.in}
+ addUserKnob {41 in_11 l "in 1" T mm13.in}
+ addUserKnob {41 in_12 l "in 1" T mm14.in}
+ addUserKnob {41 in_13 l "in 1" T mm15.in}
+ addUserKnob {41 in_14 l "in 1" T mm16.in}
+ addUserKnob {41 in_15 l "in 1" T mm4.in}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos 342
+  ypos -324
+ }
+ NoOp {
+  name NoOp7
+  label INPUT
+  xpos 342
+  ypos -230
+ }
+set Nfc800c00 [stack 0]
+ Shuffle {
+  in none
+  out alpha
+  name mm16
+  xpos 216
+  ypos 377
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm15
+  xpos 215
+  ypos 344
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm14
+  xpos 211
+  ypos 308
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm13
+  xpos 208
+  ypos 272
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm12
+  xpos 205
+  ypos 237
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm11
+  xpos 204
+  ypos 198
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm10
+  xpos 206
+  ypos 163
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm9
+  xpos 205
+  ypos 127
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm5
+  xpos 197
+  ypos -18
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm4
+  xpos 196
+  ypos -53
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm3
+  xpos 195
+  ypos -91
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm2
+  xpos 194
+  ypos -128
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm1
+  xpos 195
+  ypos -161
+ }
+set Nd4636400 [stack 0]
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm8
+  xpos 204
+  ypos 83
+ }
+push 0
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm6
+  xpos 200
+  ypos 15
+ }
+push $Nfc800c00
+ Shuffle {
+  in none
+  out alpha
+  name mm7
+  xpos 202
+  ypos 48
+ }
+ Merge2 {
+  inputs 16+1
+  operation plus
+  name Merge6
+  xpos 373
+  ypos 473
+ }
+ Clamp {
+  name Clamp2
+  xpos 373
+  ypos 518
+ }
+ NoOp {
+  name NoOp8
+  label "OUT\n"
+  xpos 373
+  ypos 605
+ }
+ Output {
+  name Output1
+  xpos 373
+  ypos 693
+ }
+push $Nd4636400
+ Viewer {
+  frame_range 1-254
+  name Viewer1
+  xpos -83
+  ypos 370
+ }
+end_group

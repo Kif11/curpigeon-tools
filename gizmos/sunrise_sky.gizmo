@@ -1,0 +1,87 @@
+#! C:/Program Files/Nuke9.0v5/nuke-9.0.5.dll -nx
+version 9.0 v5
+Gizmo {
+ inputs 0
+ lock_connections true
+ addUserKnob {20 User}
+ addUserKnob {41 sunrise l "Sunrise IMG" t "select the destination path of the sunrise\n" T Read2_sunrise.file}
+ addUserKnob {26 space l " "}
+ addUserKnob {41 translate l "Position Sky" t "Change the position of the sky\n" T Transform2_scale_translate.translate}
+ addUserKnob {41 scale l "Scale Sky" t "Increase or decrease the scale of the sky" T Transform2_scale_translate.scale}
+ addUserKnob {26 Space l " "}
+ addUserKnob {41 size l "Blur Buildings" t "Blur the Buildings\n" T Blur1.size}
+}
+ Ramp {
+  inputs 0
+  p0 {416 602}
+  p1 {416 1072}
+  name Ramp1
+  xpos 821
+  ypos 27
+ }
+ Read {
+  inputs 0
+  file //180net1/Collab/tbertino_Curpigeon/Curpigeon_Project/Img/Matte/BG_Mattes/CP_Sunrise_Tile_4K.png
+  format "26104 4000 0 0 26104 4000 1 "
+  origset true
+  name Read2_sunrise
+  xpos 700
+  ypos -138
+ }
+ Transform {
+  translate {-8082 -48}
+  scale 0.335
+  center {9775 675}
+  name Transform2_scale_translate
+  xpos 700
+  ypos -38
+ }
+ Crop {
+  box {0 0 1920 1080}
+  reformat true
+  crop false
+  name Crop3
+  xpos 700
+  ypos 1
+ }
+ Grade {
+  inputs 1+1
+  add -0.17
+  gamma {1 1.34 1.7 1}
+  gamma_panelDropped true
+  name Grade6
+  xpos 700
+  ypos 27
+ }
+ ColorCorrect {
+  saturation 1.2
+  name ColorCorrect4
+  xpos 700
+  ypos 55
+ }
+ ColorCorrect {
+  highlights.saturation {1 1.24 1.24 1.24}
+  highlights.saturation_panelDropped true
+  highlights.gain {0.9 1.12 1.12 1.12}
+  highlights.gain_panelDropped true
+  name ColorCorrect6
+  xpos 700
+  ypos 79
+ }
+ Blur {
+  size 12
+  name Blur1
+  xpos 700
+  ypos 105
+ }
+ Output {
+  name Output1
+  xpos 700
+  ypos 143
+ }
+ Output {
+  name Output1
+  xpos 700
+  ypos 243
+ }
+end_group

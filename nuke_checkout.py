@@ -1,25 +1,27 @@
-import shutil
+from config.curpigeon_template import *
 import os
 
-nuke_master_path = os.getcwd() + '/Scenes/Master/nuke/CP_Master.nk'
 
-invalid = True
-
-# Ask user for file destination until his path is valid
-while invalid:
-
-	# Grab copy destination from user
-	destination_path = raw_input('Select where you would like to copy your nuke scene: ')
+class NukeCheckout(object):
 	
-	if os.path.exists(destination_path):
-		shutil.copy(nuke_master_path, destination_path)
-		print 'Nuke scene copied to', destination_path
-		invalid = False
-	else:
-		print 'Path is not valid'
-		invalid = True
+	def __init__(self, template, sequence, shot, user, version=1):
 
 
-# End of the program
-raw_input('Press any key to finish.')   
-        
+		cpTemplate.sequence = sequence
+		cpTemplate.shot = shot
+		cpTemplate.user = user
+		cpTemplate.version = version
+
+
+		self.context = cpTemplate.context()
+
+
+	def nuke_scene_path(self):
+
+		print self.context['shot']
+
+if __name__ == '__main__':
+
+	nc = NukeCheckout(cpTemplate, 1, 2, 'kkirill2')
+
+	nc.nuke_scene_path()

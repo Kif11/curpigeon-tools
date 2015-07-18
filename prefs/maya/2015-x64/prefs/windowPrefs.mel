@@ -1,33 +1,33 @@
 //Maya Preference 2015 (Release 1)
 //
 //
-windowPref -topLeftCorner 309 -1 -widthHeight 663 601 -maximized false -parentMain true outlinerPanel1Window;
+windowPref -topLeftCorner 232 186 -widthHeight 663 1132 -maximized false -parentMain true outlinerPanel1Window;
 windowPref -topLeftCorner 250 200 -widthHeight 700 400 -maximized false -parentMain true hyperGraphPanel1Window;
 windowPref -topLeftCorner 250 200 -widthHeight 660 400 -maximized false -parentMain true graphEditor1Window;
 windowPref -topLeftCorner 250 200 -widthHeight 660 400 -maximized false -parentMain true dopeSheetPanel1Window;
 windowPref -topLeftCorner 250 200 -widthHeight 660 400 -maximized false -parentMain true clipEditorPanel1Window;
 windowPref -topLeftCorner 250 200 -widthHeight 524 470 -maximized false -parentMain true devicePanel1Window;
-windowPref -topLeftCorner 333 -628 -widthHeight 1628 966 -maximized false -parentMain true hyperShadePanel1Window;
+windowPref -topLeftCorner 244 356 -widthHeight 1628 1084 -maximized false -parentMain true hyperShadePanel1Window;
 windowPref -topLeftCorner 250 200 -widthHeight 700 400 -maximized false -parentMain true dynPaintScriptedPanelWindow;
 windowPref -topLeftCorner 250 200 -widthHeight 550 562 -maximized false -parentMain true blindDataEditor1Window;
-windowPref -topLeftCorner 462 209 -widthHeight 1331 1123 -maximized false -parentMain false MayaWindow;
+windowPref -topLeftCorner -8 -8 -widthHeight 1264 1362 -maximized true -parentMain false MayaWindow;
 windowPref -topLeftCorner 16383 16383 -widthHeight 140 28 -maximized false -parentMain true gozwin;
 windowPref -topLeftCorner 386 640 -widthHeight 694 595 -maximized false -parentMain true learningMoviesLaunchWnd;
 windowPref -topLeftCorner 523 762 -widthHeight 450 320 -maximized false -parentMain true NewFeatureHighlightWnd;
-windowPref -topLeftCorner 428 727 -widthHeight 1608 848 -maximized false -parentMain true scriptEditorPanel1Window;
+windowPref -topLeftCorner 1382 -565 -widthHeight 1608 989 -maximized false -parentMain true scriptEditorPanel1Window;
 windowPref -topLeftCorner 466 853 -widthHeight 470 484 -maximized false -parentMain true shelfEditor;
 windowPref -topLeftCorner 192 499 -widthHeight 751 818 -maximized false -parentMain true pluginManagerWindow;
 windowPref -topLeftCorner 210 390 -widthHeight 786 825 -maximized false -parentMain true PreferencesWindow;
 windowPref -topLeftCorner 466 853 -widthHeight 416 287 -maximized false -parentMain true panelArrangementWin;
-windowPref -topLeftCorner 224 335 -widthHeight 1960 1200 -maximized false -parentMain true renderViewWindow;
-windowPref -topLeftCorner 270 1372 -widthHeight 448 866 -maximized false -parentMain true unifiedRenderGlobalsWindow;
-windowPref -topLeftCorner 1351 715 -widthHeight 1940 1150 -maximized false -parentMain true vfbPanelWindow;
+windowPref -topLeftCorner 297 305 -widthHeight 1960 1200 -maximized false -parentMain true renderViewWindow;
+windowPref -topLeftCorner 207 1425 -widthHeight 447 868 -maximized false -parentMain true unifiedRenderGlobalsWindow;
+windowPref -topLeftCorner 185 149 -widthHeight 1940 1150 -maximized false -parentMain true vfbPanelWindow;
 windowPref -topLeftCorner 114 526 -widthHeight 872 1052 -maximized false -parentMain true relationshipPanel1Window;
 windowPref -topLeftCorner 466 853 -widthHeight 358 154 -maximized false -parentMain true LayerEditorQuickEditWindow;
-windowPref -topLeftCorner 669 1732 -widthHeight 716 669 -maximized false -parentMain true referenceEditorPanel1Window;
+windowPref -topLeftCorner 509 551 -widthHeight 716 669 -maximized false -parentMain true referenceEditorPanel1Window;
 windowPref -topLeftCorner 369 1033 -widthHeight 616 580 -maximized false -parentMain true refEditsWin_GEO_RaggedyRN;
 windowPref -topLeftCorner 386 640 -widthHeight 616 580 -maximized false -parentMain true refEditsWin_GEO_TomRN;
-windowPref -topLeftCorner 137 973 -widthHeight 546 350 -maximized false -parentMain true OptionBoxWindow;
+windowPref -topLeftCorner 475 931 -widthHeight 546 350 -maximized false -parentMain true OptionBoxWindow;
 windowPref -topLeftCorner 397 1475 -widthHeight 715 580 -maximized false -parentMain true refEditsWin_GEO_ErnestRN;
 windowPref -topLeftCorner 386 640 -widthHeight 616 580 -maximized false -parentMain true refEditsWin_shadow_layer_mtlRN;
 windowPref -topLeftCorner 466 853 -widthHeight 340 280 -maximized false -parentMain true PluginInfoWin;
@@ -48,3 +48,7 @@ windowPref -topLeftCorner 539 1035 -widthHeight 475 325 -maximized false -parent
 windowPref -topLeftCorner 466 853 -widthHeight 500 500 -maximized false -parentMain true FbxWarningWindow;
 windowPref -topLeftCorner 466 853 -widthHeight 550 500 -maximized false -parentMain true projectWindow;
 windowPref -topLeftCorner 440 470 -widthHeight 380 730 -maximized false -parentMain true createRenderNodeWindow;
+windowPref -topLeftCorner 466 853 -widthHeight 634 401 -maximized false -parentMain true VRayDR;
+windowPref -topLeftCorner 466 853 -widthHeight 594 100 -maximized false -parentMain true VRayEditDRlist;
+windowPref -topLeftCorner 466 853 -widthHeight 520 620 -maximized false -parentMain true connectWindow;
+windowPref -topLeftCorner 138 293 -widthHeight 1959 1126 -maximized false -parentMain true modelPanel4Window;

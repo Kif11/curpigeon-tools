@@ -95,7 +95,8 @@ class App(object):
 
 		cmds.button(label='ENV', w=40, command=self.import_env)
 		cmds.button(label='CAM', w=60, command=self.import_cam)
-		cmds.button(label='LIGHT', w=60, command=self.import_light)
+		
+		# cmds.button(label='LIGHT', w=60, command=self.import_light)
 
 		cmds.button(label='GEO', w=60, h=40, command=self.import_geo)
 		cmds.button(label='ABC', w=60, command=self.import_abc)
@@ -564,6 +565,27 @@ class App(object):
 		
 		# System - Advanced
 		cmds.setAttr(vr_setings_node + '.sys_rayc_faceLevelCoef', 2)
+
+	def configure_light_select(self):
+		
+		elements = [
+		            {'name': 'ENV_Fill_Diff', 'type': 2, 'light': 'Fill_LightShape'},
+		            {'name': 'ENV_Fill_Spec', 'type': 3, 'light': 'Fill_LightShape'},
+		            {'name': 'ENV_Sun_Diff', 'type': 2, 'light': 'Sun_LightShape'},
+		            {'name': 'ENV_Sun_Spec', 'type': 3, 'light': 'Sun_LightShape'}
+		           ]
+
+		for el in elements:
+		    
+		    light_select = pm.PyNode(mel.eval('vrayAddRenderElement LightSelectElement'))
+		    
+		    light_select.rename(el['name'])
+		    light_select.setAttr('vray_name_lightselect', el['name'])
+		    light_select.setAttr('vray_type_lightselect', el['type'])
+		    
+		    ligth = pm.PyNode(el['light'])
+		    
+		    pm.sets(light_select, include=ligth)
 
 
 	def enable_element(self, layer, args):
