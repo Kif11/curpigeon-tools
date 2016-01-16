@@ -1,5 +1,5 @@
 # Curpigeon Tools
-Is a set of tools developed during production of Curpigeon 3D animated short. It include: 
+Set of tools developed during production of Curpigeon 3D animated short. It include: 
 * Scene Assembly
 * Renderfarm submission
 * Various project and scene cleanups
