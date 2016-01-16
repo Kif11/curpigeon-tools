@@ -5,7 +5,7 @@ Is a set of tools developed during production of Curpigeon 3D animated short. It
 * Various project and scene cleanups
 * User preferences management
 
-# Lighting Scene Assembly
+# Scene Assembly
 
 > /shot_builder/app.py
 
